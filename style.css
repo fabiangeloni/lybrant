@@ -1,0 +1,1067 @@
+/* --- 1. CONFIGURACIÓN Y VARIABLES --- */
+:root {
+    --color-primary: #081e41;
+    --color-accent: #2278c0;
+    --color-highlight: #FFC107; 
+    --color-bg: #FFFFFF;
+    --color-bg-secondary: #F8F9FA;
+    --color-text: #495057;
+    --color-text-headings: #0a364e;
+    --color-border: #E9ECEF;
+    --font-heading: 'Montserrat', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 10px 20px rgba(0, 0, 0, 0.07);
+    --radius: 8px;
+    
+    --header-height: 180px; 
+}
+
+
+body {
+    font-family: var(--font-body);
+    font-weight: 400;
+    margin: 0;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* * --- NUEVA REGLA AÑADIDA --- 
+ * Añadimos el 'overflow-x: clip' a nuestro nuevo wrapper.
+ * Esto oculta el scroll horizontal del menú móvil.
+ */
+.page-wrapper {
+    overflow-x: clip;
+}
+
+
+body.nav-active {
+    overflow: hidden; /* Esto está perfecto, previene scroll vertical con menú abierto */
+}
+
+.container {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: #9730b8;
+    margin: 0 0 15px 0;
+}
+
+h1 { font-size: 3rem; line-height: 1.2; }
+h2 { font-size: 2.25rem; text-align: center; margin-bottom: 40px; }
+h3 { font-size: 1.2rem; }
+p { margin: 0 0 15px 0; }
+a { color: var(--color-accent); text-decoration: none; }
+
+/* --- 3. HEADER Y NAVEGACIÓN --- */
+.main-header {
+   padding: 15px 0;
+   position: sticky;
+   top: 0;
+   z-index: 100;
+   box-shadow: var(--shadow-sm);
+   background: linear-gradient(134.72deg, #3023ae 0%, #c024b6 101.5%);
+}
+.main-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+.logo {
+    height: 30px;
+    width: auto;
+    z-index: 99999 !important;
+    position: relative;
+}
+.main-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+.main-nav a {
+    font-family: var(--font-body);
+    /* font-weight: 500; */
+    color: #ffffff;
+    position: relative;
+    padding: 10px 0;
+    font-size: 0.9rem;
+}
+.main-nav a:not(.cta-button)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease-out;
+}
+.main-nav a:not(.cta-button):hover {
+    color:#d7a9e5;
+}
+.main-nav a:not(.cta-button):hover::after {
+    transform: scaleX(1);
+}
+
+.procesos{background-color: #e3e3eb !important;}
+
+/* --- 4. BOTONES (CTA) --- */
+.cta-button {
+    font-family: var(--font-heading);
+    /* font-weight: 600; */
+    padding: 8px 24px !important;
+    border-radius: var(--radius);
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+.cta-button:first-of-type {
+    background-color: #3423ae;
+    color: #fff;
+    border: 2px solid #3423ae;
+}
+.cta-button:first-of-type:hover {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+}
+.cta-button.secondary {
+    background-color: transparent;
+    border: 2px solid #9124b4;
+    color: var(--color-primary);
+}
+.cta-button.secondary:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-bg-secondary);
+    transform: translateY(-2px);
+}
+
+/* --- 5. SECCIONES --- */
+section {
+    padding: 80px 0;
+    overflow: visible;
+}
+
+/* ================================== */
+/* INICIO DEL BLOQUE MODIFICADO     */
+/* ================================== */
+
+/* --- SECCIÓN HERO --- */
+.hero-section {
+    padding: 60px 0;
+    min-height: calc(100vh - var(--header-height));
+    display: flex;       /* Usamos flex para centrar verticalmente... */
+    align-items: center; /* ...el .container */
+    position: relative;
+    /* Eliminamos el max-width: 960px; que estaba aquí */
+}
+
+.hero-video {
+    /* El video ya NO es position: absolute */
+    position: relative;
+    z-index: 3; /* Por encima del overlay */
+    
+    /* Le damos tamaño flexible */
+    width: 100%;
+    max-width: 450px; /* Ajusta esto si quieres el video más grande o chico */
+    height: auto;
+    border-radius: var(--radius);
+    
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* background-color: rgba(2, 16, 55, 0.39); */
+    z-index: 2; /* Queda detrás del contenido */
+}
+
+.hero-container {
+    position: relative;
+    z-index: 3;
+    
+    /* 🌟 AQUÍ LA MAGIA DEL LAYOUT 🌟 */
+    display: flex;
+    justify-content: space-between; /* Texto a la izq, video a la der */
+    align-items: center;            /* Centrados verticalmente */
+    gap: 40px;                      /* Espacio entre columnas */
+
+    /* Ya no forzamos el max-width: 420px; 
+       Hereda el max-width: 980px; de .container */
+    text-align: left;
+}
+
+.hero-content {
+    /* Hacemos que el texto ocupe un poco más de la mitad */
+    flex-basis: 55%;
+    flex-shrink: 0; /* Evita que se encoja */
+}
+
+.hero-content h1 {
+    color: #2935a2;
+    margin-bottom: 20px;
+}
+.hero-content .subtitle {
+    font-size: 1.15rem;
+    color: rgb(145 36 180);
+    margin-bottom: 30px;
+}
+.cta-group {
+    display: flex;
+    gap: 15px;
+}
+.hero-section .cta-button.secondary {
+    border-color: rgb(147 36 180);
+    color: #9324b4;
+}
+.hero-section .cta-button.secondary:hover {
+    border-color: #9324b4;
+    background-color: rgba(147, 36, 180, 0.05);
+}
+
+/* ================================== */
+/* FIN DEL BLOQUE MODIFICADO      */
+/* ================================== */
+
+
+/* --- 6. SECCIÓN TESTIMONIOS --- */
+.testimonials-section {
+    /* background-color: var(--color-primary); */
+    position: relative;
+    z-index: 5;
+    padding: 80px 0;
+    background: linear-gradient(134.72deg, #3023ae 0%, #c024b6 101.5%);
+}
+.text-white {
+    color: #FFFFFF;
+}
+.testimonial-card {
+    background-color: #FFFFFF;
+    border-radius: var(--radius);
+    padding: 40px;
+    margin: 0 10px; 
+    box-shadow: var(--shadow-sm);
+    height: 70%; 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.testimonial-quote {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.6;
+    color: var(--color-text-headings);
+    margin-bottom: 25px;
+    font-style: italic;
+}
+.testimonial-author .author-name {
+    display: block;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-primary);
+}
+.testimonial-author .author-title {
+    font-size: 0.9rem;
+    color: var(--color-text);
+}
+.splide__slide {
+    padding: 10px 0; 
+}
+.splide__track {
+    padding-bottom: 40px; 
+}
+.splide__arrow {
+    background: rgba(255, 255, 255, 0.1); 
+}
+.splide__arrow:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+.splide__arrow svg {
+    fill: #FFFFFF; 
+}
+.splide__pagination__page {
+    background: rgba(255, 255, 255, 0.4); 
+}
+.splide__pagination__page.is-active {
+    background: var(--color-accent); 
+    transform: scale(1.2);
+}
+
+/* --- 7. SECCIÓN SEGMENTACIÓN --- */
+.segmentation-section {
+    background-color: var(--color-bg-secondary);
+    position: relative;
+    z-index: 5; 
+}
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+.card {
+    background-color: var(--color-bg);
+    border: 2px solid var(--color-border);
+    padding: 30px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.3;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-md);
+}
+.card.active {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(37, 150, 190, 0.2);
+}
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: transparent;
+    -webkit-text-stroke: 2px #3423ae;
+    text-stroke: 2px var(--color-highlight);
+}
+.card p {
+    font-size: 0.9rem;
+    color: #6c757d; 
+    margin-bottom: 0;
+}
+
+/* --- 8. SECCIÓN DE CONTENIDO --- */
+.content-section {
+    padding: 60px 0 80px 0;
+    position: relative;
+    z-index: 5; 
+}
+.content-panel {
+    overflow: hidden;
+    height: 0;
+    opacity: 0;
+    visibility: hidden;
+    border-left: 4px solid #9730b8;
+    padding-left: 30px;
+}
+.content-panel#general {
+    height: auto;
+    opacity: 1;
+    visibility: visible;
+}
+.content-panel ul {
+    list-style: none;
+    padding: 0;
+}
+.content-panel li {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+.check-icon {
+    color: var(--color-highlight);
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-right: 12px;
+}
+
+/* --- 9. SECCIÓN DE PROCESO --- */
+.process-section {
+    background-color: var(--color-bg); 
+    position: relative;
+    z-index: 5;
+}
+.section-subtitle {
+    font-size: 1.15rem;
+    text-align: center;
+    max-width: 650px;
+    margin: -20px auto 50px auto;
+    color: var(--color-text);
+}
+.process-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+}
+.process-card {
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 30px;
+    background-color: #fff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.process-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-md);
+}
+.process-step-number {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #3423ae;
+    margin-bottom: 15px;
+}
+.process-step-title {
+    font-size: 1rem; 
+    margin-bottom: 10px;
+}
+
+/* --- 9.2. SECCIÓN DE SERVICIOS --- */
+.services-section {
+    background-color: var(--color-bg-secondary);
+    position: relative;
+    z-index: 5;
+    padding: 100px 0;
+}
+.service-list {
+    display: flex;
+    flex-direction: column;
+    gap: 50px; 
+}
+.service-item {
+    display: flex;
+    align-items: center;
+    gap: 0px;
+}
+.service-item:nth-child(even) {
+    flex-direction: row-reverse;
+}
+.service-item__icon {
+    flex-shrink: 0;
+    font-size: 7rem;
+    width: 180px;
+    text-align: center;
+    color: transparent;
+    -webkit-text-stroke: 2px #3423ae;
+    text-stroke: 2px var(--color-highlight);
+}
+.service-item__text h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+.service-item__text p {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 0;
+}
+.service-separator {
+    border: 0;
+    height: 1px;
+    background-color: var(--color-border);
+    width: 80%;
+    margin: 0 auto;
+}
+
+
+/* --- 9.5. SECCIÓN PRE-FOOTER --- */
+.pre-footer-section {
+    padding: 100px 0;
+    text-align: center;
+    position: relative;
+    /* background-color: var(--color-primary); */
+    z-index: 5;
+    overflow: clip;
+    background: linear-gradient(134.72deg, #3023ae 0%, #c024b6 101.5%);
+}
+.pre-footer-container {
+    position: relative; 
+    z-index: 3;
+    max-width: 700px; 
+}
+.text-white-70 {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 30px;
+}
+
+/* --- INICIA CÓDIGO NUEVO (PÉGALO EN TU STYLE.CSS) --- */
+
+/* 9.5.1 - Ajuste del contenedor para el formulario */
+.pre-footer-container {
+    max-width: 860px; /* Original era 700px, lo ampliamos para el form */
+}
+
+/* 9.6. FORMULARIO PRE-FOOTER */
+.contact-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas por defecto */
+    gap: 20px 30px;
+    margin-top: 40px;
+    text-align: left; /* Alinea el texto del form a la izquierda */
+}
+
+.form-group {
+    position: relative;
+}
+
+/* Hacemos que "Mensaje" y "Enviar" ocupen el ancho completo */
+.form-group.full-width,
+.form-submit.full-width {
+    grid-column: 1 / -1; /* Ocupa desde la columna 1 hasta la última */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8); /* Blanco con un poco de transparencia */
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    box-sizing: border-box; /* Importante para que el padding no rompa el ancho */
+    padding: 14px 16px;
+    background-color: rgba(0, 0, 0, 0.2); /* Fondo oscuro transparente */
+    border: 2px solid rgba(255, 255, 255, 0.3); /* Borde blanco semi-opaco */
+    border-radius: var(--radius); /* Usamos tu variable de radio! */
+    color: #FFFFFF;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* --- 🌟 AQUÍ ESTÁ EL EFECTO DE CLIC / FOCO 🌟 --- */
+
+/* 1. Cuando hacemos foco en el input/textarea... */
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none; /* Quitamos el resplandor azul feo del navegador */
+    border-color: var(--color-highlight); /* Usamos tu color "highlight" (amarillo) */
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.3); /* Un resplandor suave a juego */
+}
+
+/* 2. Cuando el .form-group está "activo" (contiene el foco)... */
+.form-group:focus-within label {
+    color: var(--color-highlight); /* La etiqueta también se pone amarilla */
+}
+
+/* --- Fin del Efecto --- */
+
+
+.form-submit {
+    margin-top: 10px;
+}
+
+.form-submit .cta-button {
+    width: 100%; /* El botón ocupará todo el ancho */
+    padding: 12px 24px !important;
+    font-size: 1.1rem;
+}
+
+/* 9.7. RESPONSIVE DEL FORMULARIO */
+@media (max-width: 768px) {
+    .contact-form {
+        grid-template-columns: 1fr; /* 1 sola columna en móvil */
+        gap: 20px;
+    }
+
+    /* En móvil, ya no necesitamos la clase .full-width */
+    .form-group.full-width,
+    .form-submit.full-width {
+        grid-column: auto;
+    }
+}
+
+/* --- FIN DEL CÓDIGO NUEVO --- */
+
+/* --- 9.9. FOOTER --- */
+.main-footer {
+    background-color: var(--color-primary);
+    color: var(--color-bg-secondary);
+    padding: 40px 0;
+    text-align: center;
+    position: relative;
+    z-index: 5; 
+}
+
+/* --- 10. NAVEGACIÓN RESPONSIVE --- */
+/* --- INICIA REEMPLAZO AQUÍ --- */
+
+.nav-toggle {
+    display: none; 
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 1001; 
+}
+
+.hamburger-box {
+    width: 24px;  /* Original: 30px */
+    height: 18px; /* Original: 24px */
+    display: inline-block;
+    position: relative;
+}
+
+.hamburger-inner {
+    display: block;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;  /* Original: 30px */
+    height: 2px;  /* Original: 3px */
+    background-color: var(--color-primary);
+    border-radius: 3px;
+    position: absolute;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.hamburger-inner::before,
+.hamburger-inner::after {
+    content: '';
+    width: 100%;
+    height: 2px;  /* Original: 3px */
+    background-color: var(--color-primary);
+    border-radius: 3px;
+    position: absolute;
+    left: 0;
+    transition: transform 0.3s ease;
+}
+
+.hamburger-inner::before {
+    top: -8px;    /* Original: -10px */
+}
+
+.hamburger-inner::after {
+    bottom: -8px; /* Original: -10px */
+}
+
+.nav-toggle.is-active .hamburger-inner {
+    transform: translateY(-50%) rotate(45deg);
+    background-color: var(--color-primary);
+}
+
+.nav-toggle.is-active .hamburger-inner::before {
+    transform: rotate(90deg) translate(-8px, 0); /* Original: -10px */
+    opacity: 0;
+}
+
+.nav-toggle.is-active .hamburger-inner::after {
+    transform: rotate(-90deg) translate(0, 0);
+    bottom: 0;
+    transform: rotate(-90deg);
+}
+
+/* --- TERMINA REEMPLAZO AQUÍ --- */
+.nav-overlay {
+    display: none; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    visibility: hidden;
+}
+
+
+
+/* --- 11. ESTADOS INICIALES (para GSAP) --- */
+/* Vacío. GSAP usa .from() y lo maneja automáticamente */
+
+
+/* --- 12. MEDIA QUERIES (RESPONSIVE) --- */
+@media (max-width: 992px) {
+    /* --- Header y Nav Móvil --- */
+    .nav-toggle {
+        display: flex;
+    }
+    .nav-overlay {
+        display: block;
+    }
+    .main-nav {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 100vh;
+        background: var(--color-bg);
+        z-index: 1000;
+        transform: translateX(100%);
+        transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        padding-top: 100px; 
+    }
+    .main-nav.is-active {
+        transform: translateX(0);
+    }
+    .main-nav ul {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 0 40px;
+    }
+    .main-nav a {
+        font-size: 1.25rem;
+        color: black;
+    }
+    .main-nav a:not(.cta-button)::after {
+        display: none; 
+    }
+    .main-nav li {
+        width: 100%;
+    }
+    .main-nav .cta-button {
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    /* --- Layout de Secciones --- */
+    section {
+        padding: 60px 0;
+    }
+
+    /* ================================== */
+    /* INICIO DEL BLOQUE MODIFICADO     */
+    /* ================================== */
+
+    /* --- Hero y Pre-Footer --- */
+    h1 {
+        font-size: 2.5rem; 
+    }
+    
+    /* Esta regla .cta-group ya la tenías, la mantenemos */
+    .cta-group {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+    .cta-group a {
+        max-width: 350px;
+        padding: 5px !important;
+    }
+    
+    /* REGLAS NUEVAS/MODIFICADAS PARA EL HERO */
+    .hero-container {
+        flex-direction: column; /* Apilamos las columnas */
+        justify-content: center; /* Centramos el contenido */
+        text-align: center;      /* Centramos el texto */
+    }
+
+    .hero-content {
+        flex-basis: auto; /* Reseteamos el tamaño */
+    }
+
+    .hero-content .cta-group {
+        justify-content: center; /* Centramos los botones */
+    }
+    
+    /* Esta regla la tenías y es PERFECTA. La mantenemos. */
+    /* Oculta el video en móvil y usa un fondo de fallback */
+    .hero-section .hero-video,
+    .pre-footer-section .hero-video {
+        display: none;
+    }
+
+    .hero-section,
+    .pre-footer-section {
+        background-size: cover;
+        background-position: center center;
+        padding: 80px 0; 
+        min-height: auto; 
+    }
+
+    /* ================================== */
+    /* FIN DEL BLOQUE MODIFICADO      */
+    /* ================================== */
+
+    /* --- Cards --- */
+    .cards-container {
+        grid-template-columns: 1fr; 
+    }
+
+    /* --- Contenido --- */
+    .content-panel {
+        padding-left: 20px;
+    }
+    /* --- Proceso --- */
+    .process-grid {
+        grid-template-columns: 1fr; 
+    }
+    /* --- Servicios --- */
+    .service-item,
+    .service-item:nth-child(even) {
+        flex-direction: column; 
+        text-align: center;
+        gap: 20px;
+    }
+    .service-item__icon {
+        width: auto;
+        font-size: 3.5rem; 
+    }
+    .service-separator {
+        width: 100%; 
+        margin: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Ajustes finos para móviles pequeños */
+    .container {
+        padding: 0 30px;
+    }
+    h1 {
+        font-size: 2.5rem;
+    }
+    h2 {
+        font-size: 1.75rem;
+    }
+    .main-nav {
+        width: 100%; 
+    }
+}
+
+/* --- 9.9. FOOTER --- */
+/* Reemplazamos el estilo de .main-footer que tenías */
+.main-footer {
+    background-color: #080613;
+    color: var(--color-bg-secondary);
+    padding: 80px 0 40px 0; /* Más padding arriba */
+    text-align: left; /* Lo alineamos a la izquierda */
+    position: relative;
+    z-index: 5;
+    font-size: 0.95rem;
+}
+
+.footer-grid {
+    display: grid;
+    /* 4 columnas en desktop */
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 40px;
+}
+
+.footer-logo {
+    height: 35px; /* Un poco más pequeño que en el header */
+    width: auto;
+    margin-bottom: 15px;
+}
+
+.footer-tagline {
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+.footer-column h4 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #FFFFFF;
+    margin: 0 0 20px 0;
+}
+
+/* Estilos para listas del footer */
+.footer-nav,
+.footer-contact {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.footer-nav li,
+.footer-contact li {
+    margin-bottom: 12px;
+}
+
+.footer-nav a {
+    color: var(--color-bg-secondary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-nav a:hover {
+    color: #9730b8; /* Amarillo al pasar el mouse */
+}
+
+/* El CTA "Consultar" en el footer */
+.footer-cta {
+    font-weight: 700;
+    color: var(--color-highlight);
+}
+.footer-cta:hover {
+    color: #FFFFFF !important;
+}
+
+/* Estilos para la lista de contacto (con iconos) */
+.footer-contact li {
+    
+    gap: 12px;
+    color: var(--color-bg-secondary);
+    line-height: 1.6;
+}
+
+.footer-contact i {
+    font-size: 1rem;
+    color: #9730b8; /* Iconos amarillos */
+    margin-top: 5px;
+}
+
+/* Estilos para redes sociales */
+.social-title {
+    margin-top: 30px; /* Separador de la lista "Legal" */
+}
+
+.social-icons a {
+    color: var(--color-bg-secondary);
+    font-size: 1.5rem;
+    margin-right: 20px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.social-icons a:hover {
+    color: var(--color-highlight);
+}
+
+/* Separador horizontal */
+.footer-divider {
+    border: 0;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 50px 0 30px 0;
+}
+
+/* Texto de Copyright */
+.footer-bottom p {
+    text-align: center;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+
+/* --- RESPONSIVE DEL FOOTER --- */
+/* Siguiendo tu breakpoint existente */
+@media (max-width: 992px) {
+    .footer-grid {
+        /* Pasamos de 4 a 2 columnas */
+        grid-template-columns: 1fr; 
+        gap: 50px 30px;
+    }
+
+    .footer-column {
+        /* Centramos el contenido de la columna 1 y 4 */
+        text-align: center;
+    }
+
+    .footer-column:nth-child(2),
+    .footer-column:nth-child(3) {
+        text-align: center; /* Dejamos nav y contacto a la izquierda */
+    }
+
+    .footer-logo {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .footer-contact li {
+        justify-content: flex-start; /* Alinear items de contacto */
+    }
+}
+
+@media (max-width: 480px) {
+    .main-footer {
+        padding-top: 60px;
+        text-align: center; /* Todo centrado en móvil */
+    }
+
+    .footer-grid {
+        /* Pasamos a 1 columna */
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .footer-column,
+    .footer-column:nth-child(2),
+    .footer-column:nth-child(3) {
+        text-align: center; /* Forzar todo al centro */
+    }
+
+    .footer-contact li {
+        justify-content: center; /* Centrar items de contacto */
+        text-align: center;
+    }
+
+    .social-icons a {
+        margin: 0 12px; /* Ajustar espaciado de iconos */
+    }
+}
+
+/* --- 13. SELECTOR DE IDIOMA --- */
+
+.lang-switcher {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 10px; /* Pequeño espacio extra en desktop */
+}
+
+.lang-separator {
+    color: var(--color-border);
+    font-weight: 600;
+    margin: 0 2px;
+}
+
+.lang-link {
+    font-family: var(--font-heading);
+    /* font-weight: 700; */
+    font-size: 0.9rem;
+    color: var(--color-text);
+    opacity: 0.6; /* Los inactivos se ven apagados */
+    text-decoration: none;
+    transition: all 0.3s ease;
+    padding: 5px;
+}
+
+.lang-link.active {
+    color: var(--color-primary);
+    opacity: 1; /* El activo resalta */
+}
+
+.lang-link:hover {
+    opacity: 1;
+    color: var(--color-accent);
+}
+
+/* --- Ajustes para el menú móvil --- */
+@media (max-width: 992px) {
+    .lang-switcher {
+        justify-content: center; /* Centramos el switcher en el menú */
+        padding: 15px 0;
+        margin-top: 15px;
+        margin-left: 0;
+        width: 100%;
+        border-top: 1px solid var(--color-border); /* Un separador */
+    }
+
+    .lang-link {
+        font-size: 1.1rem; /* Un poco más grande para tocarlo */
+    }
+}
