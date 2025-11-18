@@ -212,6 +212,8 @@ section {
     flex-shrink: 0; /* Evita que se encoja */
 }
 
+.hero-content img{display: none;}
+
 .hero-content h1 {
     color: #2935a2;
     margin-bottom: 20px;
@@ -767,6 +769,8 @@ section {
     .hero-content {
         flex-basis: auto; /* Reseteamos el tamaño */
     }
+
+     .hero-content img{max-width:60vw; display: block;}
 
     .hero-content .cta-group {
         justify-content: center; /* Centramos los botones */
