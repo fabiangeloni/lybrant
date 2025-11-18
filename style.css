@@ -1205,10 +1205,10 @@ AÑADE ESTO AL FINAL DE TU 'style.css'
 /* --- NUEVA SECCIÓN INTERACTIVA (CORREGIDA PARA STICKY) --- */
 
 .interactive-feature-section {
-    background-color: var(--color-bg-secondary);
+    background-color: #ffffff;
     padding: 100px 0;
     /* IMPORTANTE: Quitamos overflow: hidden para que funcione position: sticky */
-    overflow: visible; 
+    overflow: visible;
     position: relative;
 }
 
@@ -1351,10 +1351,10 @@ AÑADE ESTO AL FINAL DE TU 'style.css'
     position: relative;
     width: 100%;
     /* Aspect Ratio cuadrado o 4:3 funciona mejor para sticky */
-    padding-top: 80%; 
+    padding-top: 80%;
     border-radius: var(--radius);
     overflow: hidden;
-    box-shadow: var(--shadow-md);
+    /* box-shadow: var(--shadow-md); */
     background-color: #fff;
 }
 
@@ -1364,11 +1364,11 @@ AÑADE ESTO AL FINAL DE TU 'style.css'
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    /* object-fit: cover; */
     opacity: 0;
     visibility: hidden;
     /* Un scale inicial suave */
-    transform: scale(1.1); 
+    transform: scale(1.1);
 }
 
 .feature-img.active {
