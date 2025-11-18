@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     // --- 3. LÓGICA DE SEGMENTACIÓN (INTERACTIVA) ---
+    // (Tu código original - Está perfecto)
     const cards = document.querySelectorAll(".card");
     const panels = document.querySelectorAll(".content-panel");
     const generalPanel = document.getElementById("general");
@@ -50,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function() {
             currentActivePanel = targetPanel;
             
             lenis.scrollTo(contentSection, {
-                offset: -180, // Ajustado a tu altura de header
+                offset: -180,
                 duration: 1.2,
                 ease: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
             });
@@ -58,9 +59,9 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
 
-    // --- 4. ANIMACIONES DE SCROLL (BARRIDO HORIZONTAL + RESPONSIVE) ---
+    // --- 4. ANIMACIONES DE SCROLL ---
     
-    // 4.1. Animación General de Carga (Esto corre en AMBOS, desktop y móvil)
+    // 4.1. Animación General de Carga
     gsap.from('body', { duration: 0.5, autoAlpha: 0, ease: 'power3.out' });
     gsap.from('.main-header', { duration: 1, yPercent: -100, autoAlpha: 0, ease: 'power3.out', delay: 0.1 });
     gsap.from(".hero-content > *", { 
@@ -72,86 +73,133 @@ document.addEventListener("DOMContentLoaded", function() {
         ease: "power3.out"
     });
 
-    // ==================================
-    //     INICIO DEL BLOQUE NUEVO
-    // ==================================
-    // Animación para el video del Hero
     gsap.from(".hero-video", {
         duration: 1.2,
-        x: 50, // Lo movemos 50px a la derecha (animará hacia la izquierda)
+        x: 50,
         autoAlpha: 0,
-        delay: 0.6, // Un poco después de que empiece el texto
+        delay: 0.6,
         ease: "power3.out"
     });
-    // ==================================
-    //       FIN DEL BLOQUE NUEVO
-    // ==================================
-
-
-   // --- COPIA Y REEMPLAZA DESDE AQUÍ ---
-
-    // 4.2. Animación "Weave" (Alternancia Horizontal)
-    const sections = gsap.utils.toArray('main > section:not(.hero-section)');
-
+    
+    // 4.2. Animaciones por Media Query
+    
     ScrollTrigger.matchMedia({
 
-        // 1. Configuración para DESKTOP (SÍ corre la animación "weave" horizontal)
+        // ======================================================
+        // 1. Configuración para DESKTOP (993px en adelante)
+        // ======================================================
         "(min-width: 993px)": function() {
-            sections.forEach((section, index) => {
-                const heading = section.querySelector('h2');
-                const subtitle = section.querySelector('.section-subtitle');
-                const content = section.querySelectorAll('.splide, .cards-container, .content-panel#general, .process-grid, .service-list, .pre-footer-container, .main-footer .container');
-
-                // Animación Horizontal (la que ya tenías)
-                const xPercent = (index % 2 === 0) ? -50 : 50;
+            
+            // --- A) Animación simple de Fade-In para las secciones viejas ---
+            // (Eliminamos la animación "Weave" que causaba conflictos)
+            const sections = gsap.utils.toArray('main > section:not(.hero-section, .process-sticky-container)');
+            sections.forEach((section) => {
+                const elements = section.querySelectorAll('h2, .section-subtitle, .splide, .cards-container, .content-panel#general, .service-list, .pre-footer-container, .main-footer .container');
+                if (elements.length === 0) return;
                 
-                const tl = gsap.timeline({
+                gsap.from(elements, {
                     scrollTrigger: {
                         trigger: section,
                         start: 'top 85%', 
                         toggleActions: 'play none none none'
-                    }
+                    },
+                    autoAlpha: 0,
+                    y: 30,
+                    stagger: 0.05,
+                    duration: 1,
+                    ease: 'power3.out'
                 });
-                
-                if (heading) tl.from(heading, { autoAlpha: 0, xPercent: xPercent, duration: 1.2, ease: 'power3.out' });
-                if (subtitle) tl.from(subtitle, { autoAlpha: 0, xPercent: xPercent, duration: 1.2, ease: 'power3.out' }, "-=1.0");
-                if (content) tl.from(content, { autoAlpha: 0, xPercent: xPercent, duration: 1.2, ease: 'power3.out' }, "-=0.9");
             });
-        },
 
-        // 2. Configuración para MÓVIL (NUEVA Animación "Fade-In" vertical)
+
+            // ===================================================================
+            // --- B) SCRIPT STICKY STACK (V7 - Arquitectura Correcta) ---
+            // ===================================================================
+            
+            const stickyPanels = gsap.utils.toArray(".process-panel");
+            const allCards = stickyPanels.map(panel => panel.querySelector(".process-card"));
+
+            if (allCards.length) {
+                
+                // NO NECESITAMOS 'gsap.set'.
+                // Todas las tarjetas están visibles por defecto.
+                // El CSS ('position: sticky') hace que el panel 2 tape al 1,
+                // el 3 al 2, etc.
+
+                // 1. Recorremos los paneles (empezando por el 2do, índice 1)
+                stickyPanels.forEach((panel, i) => {
+                    
+                    if (i === 0) return; // Saltamos el primer panel
+
+                    // Esta es la tarjeta que se quedará ATRÁS
+                    const prevCard = allCards[i - 1]; 
+
+                    // 2. Creamos un ScrollTrigger que se activa cuando el panel
+                    // que ENTRA (el 'panel') empieza a tapar al anterior.
+                    ScrollTrigger.create({
+                        trigger: panel,      // El trigger es el panel que entra (2, 3, 4)
+                        start: "top bottom", // Cuando el 'top' de este panel toca el 'bottom' de la ventana
+                        end: "top top",      // Cuando el 'top' de este panel toca el 'top' de la ventana
+                        scrub: 0.5,          // Suavidad
+                        
+                        // markers: true,    // Descomenta esto para ver las guías
+                        // id: `panel-out-${i}`,
+
+                        // 3. En cada update del scroll, animamos la tarjeta ANTERIOR
+                        onUpdate: (self) => {
+                            // self.progress va de 0 a 1
+                            
+                            // Escala: de 1 a 0.9
+                            let scale = 1 - (self.progress * 0.1); 
+                            // Opacidad: de 1 a 0.7
+                            let opacity = 1 ;
+                            
+                            // Usamos gsap.to() para aplicar esto con suavidad
+                            gsap.to(prevCard, {
+                                scale: scale,
+                                autoAlpha: opacity,
+                                ease: "none",
+                                duration: 0.05 // Un 'duration' bajo lo hace instantáneo al scrub
+                            });
+                        }
+                    });
+                });
+            } // fin del if(allCards.length)
+
+        }, // --- FIN de (min-width: 993px) ---
+
+        // ======================================================
+        // 2. Configuración para MÓVIL (992px hacia abajo)
+        // ======================================================
         "(max-width: 992px)": function() {
             
-            // ¡Este es el bloque que antes estaba vacío!
-            // Ahora creamos una animación vertical simple.
+            // En móvil, animamos todo con un fade-in simple
+            const allSections = gsap.utils.toArray('main > section'); 
             
-            sections.forEach((section) => {
-                // Seleccionamos todos los elementos que queremos animar DENTRO de la sección
+            allSections.forEach((section) => {
                 const elementsToAnimate = section.querySelectorAll('h2, .section-subtitle, .splide, .card, .process-card, .service-item, .pre-footer-container h2, .pre-footer-container .subtitle, .main-footer p');
                 
                 if (elementsToAnimate.length === 0) return;
 
-                // Creamos la animación
                 gsap.from(elementsToAnimate, {
                     scrollTrigger: {
                         trigger: section,
-                        start: 'top 90%', // Empezar un poco después en móvil
+                        start: 'top 90%',
                         toggleActions: 'play none none none'
                     },
-                    autoAlpha: 0, // Opacidad y visibility
-                    y: 40,        // Mover 40px hacia abajo (animará hacia arriba)
+                    autoAlpha: 0,
+                    y: 40,
                     duration: 0.8,
-                    stagger: 0.1, // Pequeño retraso entre cada elemento
+                    stagger: 0.1,
                     ease: 'power3.out'
                 });
             });
-        }
-    });
-
-// --- HASTA AQUÍ ---
+        } // --- FIN de (max-width: 992px) ---
+    }); // --- FIN de ScrollTrigger.matchMedia ---
 
     
     // --- 5. SLIDER DE TESTIMONIOS (Splide.js) ---
+    // (Tu código original - Está perfecto)
     if (typeof Splide !== 'undefined') {
         new Splide('#testimonial-slider', {
             type   : 'loop',
@@ -168,13 +216,11 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // --- 6. NAVEGACIÓN MÓVIL ---
-   // --- COPIA Y REEMPLAZA TODA LA SECCIÓN 6 CON ESTO ---
-
-    // --- 6. NAVEGACIÓN MÓVIL ---
+    // (Tu código original - Está perfecto)
     const navToggle = document.querySelector('.nav-toggle');
     const mainNav = document.querySelector('.main-nav');
     const navOverlay = document.querySelector('.nav-overlay');
-    const navLinks = document.querySelectorAll('.main-nav a'); // Seleccionamos TODOS los links
+    const navLinks = document.querySelectorAll('.main-nav a');
     const body = document.body;
 
     function openMenu() {
@@ -193,7 +239,6 @@ document.addEventListener("DOMContentLoaded", function() {
         navToggle.setAttribute('aria-expanded', 'false');
     }
 
-    // Lógica para abrir/cerrar con el botón
     navToggle.addEventListener('click', () => {
         if (mainNav.classList.contains('is-active')) {
             closeMenu();
@@ -202,52 +247,26 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Lógica para cerrar con el overlay
     navOverlay.addEventListener('click', closeMenu);
 
-    // --- ESTA ES LA PARTE NUEVA Y CORREGIDA ---
-    // Lógica inteligente para los links
     navLinks.forEach(link => {
         link.addEventListener('click', function(event) {
             
-            // Obtenemos el destino (href) del link en el que se hizo clic
             const href = this.getAttribute('href');
 
-            // ----------------------------------------------------
-            // CASO A: Es un link de ancla (href="#")
-            // (como "Servicios", "Nosotros", "Consultar")
-            // ----------------------------------------------------
             if (href === '#') {
-                // 1. Prevenimos que la página salte al inicio
                 event.preventDefault();
-                // 2. Simplemente cerramos el menú
                 closeMenu();
             } 
-            
-            // ----------------------------------------------------
-            // CASO B: Es un link que navega a OTRA página
-            // (como "index.html" o "index-en.html")
-            // ----------------------------------------------------
             else {
-                // 1. Prevenimos la navegación INMEDIATA
                 event.preventDefault();
-                
-                // Guardamos la URL a la que queremos ir
                 const destination = href;
-
-                // 2. Cerramos el menú
                 closeMenu();
-
-                // 3. ESPERAMOS a que la animación de cierre termine
-                //    (Tu CSS dice que la transición dura 0.4s = 400ms)
-                //    y SÓLO ENTONCES navegamos a la nueva página.
                 setTimeout(() => {
                     window.location.href = destination;
                 }, 400); 
             }
         });
     });
-
-// --- HASTA AQUÍ EL REEMPLAZO ---
 
 });

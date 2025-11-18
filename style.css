@@ -67,7 +67,8 @@ a { color: var(--color-accent); text-decoration: none; }
    top: 0;
    z-index: 100;
    box-shadow: var(--shadow-sm);
-   background: linear-gradient(134.72deg, #3023ae 0%, #c024b6 101.5%);
+   background: linear-gradient(134.72deg, #3023aede 0%, #c024b6db 101.5%);
+    backdrop-filter: blur(2px);
 }
 .main-header .container {
     display: flex;
@@ -149,7 +150,7 @@ a { color: var(--color-accent); text-decoration: none; }
 
 /* --- 5. SECCIONES --- */
 section {
-    padding: 80px 0;
+    padding: 50px 0;
     overflow: visible;
 }
 
@@ -429,7 +430,6 @@ section {
     background-color: var(--color-bg-secondary);
     position: relative;
     z-index: 5;
-    padding: 100px 0;
 }
 .service-list {
     display: flex;
@@ -1065,3 +1065,105 @@ section {
         font-size: 1.1rem; /* Un poco más grande para tocarlo */
     }
 }
+
+/* 1. Contenedor principal de la sección */
+.process-sticky-container {
+    padding-top: 80px;
+    padding-bottom: 80px;
+    background-color: #f8f9fa; 
+    position: relative;
+    z-index: 5;
+    /* Quitamos el padding-bottom para que el pin funcione bien */
+}
+
+/* El título se mantiene centrado como lo tenías */
+.process-sticky-container h2 {
+    text-align: center;
+}
+.process-sticky-container .section-subtitle {
+    text-align: center;
+    max-width: 650px;
+    margin: -20px auto 50px auto;
+}
+
+/* 2. El wrapper que se "pinará" */
+.process-sticky-wrapper {
+    position: relative;
+    height: 400vh; /* 100vh por cada panel (4 paneles) */
+    /* GSAP usará este wrapper como trigger */
+    background: linear-gradient(134.72deg, #3023ae 0%, #c024b6 101.5%);
+}
+
+/* 3. Estilo de cada panel (pantalla completa) */
+.process-panel {
+    position: sticky; /* La magia del "apilado" */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh; /* Cada panel ocupa toda la pantalla */
+    
+    /* Centramos la tarjeta dentro del panel */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* El color de fondo lo definimos en el HTML con style= */
+    background-color: var(--panel-color); 
+    
+    /* Ocultamos el overflow para la animación de escala */
+    overflow: hidden; 
+}
+
+/* 4. La tarjeta (re-usamos tu estilo .process-card) */
+.process-panel .process-card {
+    /* Mantenemos el estilo de tu tarjeta original */
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 30px;
+    background-color: #fff;
+    box-shadow: var(--shadow-md); /* Sombra más fuerte para que destaque */
+    
+    /* Le damos un ancho máximo y un ancho responsive */
+    width: 90%;
+    max-width: 600px; /* Un buen tamaño para la tarjeta */
+    
+    /* GSAP controlará esto, pero es bueno tener un default */
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Mantenemos tus estilos de texto de la tarjeta */
+.process-panel .process-step-number {
+    font-family: var(--font-heading);
+    font-size: 4.5rem;
+    font-weight: 700;
+    color: var(--color-highlight);
+    margin-bottom: 15px;
+}
+
+.process-panel .process-step-title {
+    font-size: 1.2rem; /* Un poco más grande */
+    margin-bottom: 10px;
+}
+
+/* En móvil, no hacemos el efecto (es mejor un scroll simple) */
+@media (max-width: 992px) {
+    /* Desactivamos la altura y el pin */
+    .process-sticky-wrapper {
+        height: auto;
+    }
+    
+    /* Hacemos que los paneles se apilen verticalmente */
+    .process-panel {
+        position: relative; /* Reseteamos el sticky */
+        height: auto; /* Altura automática */
+        overflow: visible;
+        margin: 10px auto;
+        
+    }
+
+    .process-panel .process-card {
+        max-width: 500px;
+    }
+}
+
