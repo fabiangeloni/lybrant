@@ -222,7 +222,7 @@ section {
 }
 .hero-content .subtitle {
     font-size: 1.15rem;
-    color: rgb(145 36 180);
+    color: rgb(59 59 59);
     margin-bottom: 30px;
 }
 .cta-group {
@@ -1143,7 +1143,7 @@ section {
     font-family: var(--font-heading);
     font-size: 4.5rem;
     font-weight: 700;
-    color: var(--color-highlight);
+    color: #07ff8a;
     margin-bottom: 15px;
 }
 
@@ -1319,7 +1319,7 @@ AÑADE ESTO AL FINAL DE TU 'style.css'
 }
 
 .feature-checklist i {
-    color: var(--color-highlight);
+    color: #07ff8a;
     margin-right: 10px;
 }
 
