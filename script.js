@@ -89,6 +89,24 @@ document.addEventListener("DOMContentLoaded", function() {
         // 1. Configuración para DESKTOP (993px en adelante)
         // ======================================================
         "(min-width: 993px)": function() {
+
+            // ==========================================================
+            // --- PEGA EL NUEVO CÓDIGO AQUÍ ---
+            // ==========================================================
+            // Efecto Parallax para el Hero
+            gsap.to(".hero-content, .hero-video", {
+                yPercent: 70, // <-- Mueve 30% hacia abajo (scroll más lento)
+                ease: "none", // Lineal, sin aceleración
+                scrollTrigger: {
+                    trigger: ".hero-section", // El trigger es el hero
+                    start: "top top", // Empieza cuando el hero toca el top
+                    end: "bottom top", // Termina cuando el hero sale por el top
+                    scrub: true       // ¡La magia! Conecta la animación al scroll
+                }
+            });
+            // ==========================================================
+            // --- FIN DEL NUEVO CÓDIGO ---
+            // ==========================================================
             
             // --- A) Animación simple de Fade-In para las secciones viejas ---
             // (Eliminamos la animación "Weave" que causaba conflictos)
@@ -269,4 +287,91 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-});
+    // ... (Todo tu script.js existente)
+
+    // --- 7. PARTÍCULAS EN EL FORMULARIO DE CONTACTO (tsParticles) ---
+    // (Asegúrate de que el script de tsParticles esté cargado en tu HTML antes de este)
+    if (typeof tsParticles !== 'undefined') {
+        tsParticles.load({
+            id: "tsparticles-background", // El ID del div que creamos en el HTML
+            options: {
+                background: {
+                    color: {
+                        value: "transparent", // El fondo ya lo da tu CSS de .pre-footer-container
+                    },
+                },
+                fpsLimit: 60,
+                interactivity: {
+                    events: {
+                        onClick: {
+                            enable: false, // No queremos que reaccionen al click
+                            mode: "push",
+                        },
+                        onHover: {
+                            enable: false, // No queremos que reaccionen al hover
+                            mode: "grab",
+                        },
+                        resize: true,
+                    },
+                    modes: {
+                        push: {
+                            quantity: 4,
+                        },
+                        grab: {
+                            distance: 150,
+                            links: {
+                                opacity: 1,
+                            },
+                        },
+                    },
+                },
+                particles: {
+                    color: {
+                        value: "#ffffff", // Color de las partículas (blanco)
+                    },
+                    links: {
+                        color: "#ffffff", // Color de las líneas entre partículas (blanco)
+                        distance: 150,
+                        enable: true,
+                        opacity: 0.3, // Líneas semi-transparentes
+                        width: 1,
+                    },
+                    collisions: {
+                        enable: false,
+                    },
+                    move: {
+                        direction: "none",
+                        enable: true,
+                        outModes: {
+                            default: "bounce",
+                        },
+                        random: true, // Movimiento aleatorio
+                        speed: 0.5,   // MUY LENTO
+                        straight: false,
+                    },
+                    number: {
+                        density: {
+                            enable: true,
+                            area: 800,
+                        },
+                        value: 80, // Número de partículas
+                    },
+                    opacity: {
+                        value: 0.5, // Opacidad de las partículas
+                    },
+                    shape: {
+                        type: "circle", // Forma de las partículas
+                    },
+                    size: {
+                        value: { min: 1, max: 3 }, // Tamaño de las partículas
+                    },
+                },
+                detectRetina: true,
+            },
+        });
+    }
+
+    
+
+}); // <-- ESTE ES EL '});' DE CIERRE ORIGINAL DE TU ARCHIVO DOMContentLoaded
+

@@ -1167,3 +1167,34 @@ section {
     }
 }
 
+/* ===================================================================
+AÑADE ESTO AL FINAL DE TU 'style.css'
+===================================================================
+*/
+
+/* Estilos para el contenedor de partículas */
+#tsparticles-background {
+    position: absolute; /* Para que cubra el fondo de la sección */
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 0; /* Aseguramos que quede detrás del contenido */
+}
+
+/* Asegurar que el contenido del pre-footer esté por encima */
+.pre-footer-container {
+    position: relative; /* Clave para que #tsparticles-background se posicione */
+    z-index: 1; /* El contenido estará por encima de las partículas */
+    overflow: hidden; /* Para que las partículas no se salgan si se mueven mucho */
+}
+
+/* Para asegurar que el texto sea legible sobre las partículas */
+.pre-footer-container h2,
+.pre-footer-container p {
+    color: #fff; /* O el color que mejor contraste con tus partículas */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5); /* Sombra para mejor legibilidad */
+}
+
+
+
