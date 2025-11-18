@@ -245,7 +245,7 @@ section {
 .testimonials-section {
     /* background-color: var(--color-primary); */
     position: relative;
-    z-index: 5;
+    z-index: 9;
     padding: 80px 0;
     background: linear-gradient(134.72deg, #3023ae 0%, #c024b6 101.5%);
 }
