@@ -166,6 +166,7 @@ section {
     align-items: center; /* ...el .container */
     position: relative;
     /* Eliminamos el max-width: 960px; que estaba aquí */
+    z-index: 10;
 }
 
 .hero-video {
@@ -217,6 +218,7 @@ section {
 .hero-content h1 {
     color: #2935a2;
     margin-bottom: 20px;
+    /* z-index: 10; */
 }
 .hero-content .subtitle {
     font-size: 1.15rem;
@@ -245,7 +247,7 @@ section {
 .testimonials-section {
     /* background-color: var(--color-primary); */
     position: relative;
-    z-index: 9;
+    z-index: 11;
     padding: 80px 0;
     background: linear-gradient(134.72deg, #3023ae 0%, #c024b6 101.5%);
 }
