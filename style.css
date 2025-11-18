@@ -55,7 +55,7 @@ h1, h2, h3, h4, h5 {
 }
 
 h1 { font-size: 3rem; line-height: 1.2; }
-h2 { font-size: 2.25rem; text-align: center; margin-bottom: 40px; }
+h2 {font-size: 2.25rem;text-align: center;margin-bottom: 40px;color: #3423ae;}
 h3 { font-size: 1.2rem; }
 p { margin: 0 0 15px 0; }
 a { color: var(--color-accent); text-decoration: none; }
@@ -363,7 +363,7 @@ section {
     height: 0;
     opacity: 0;
     visibility: hidden;
-    border-left: 4px solid #9730b8;
+    border-left: 4px solid #3423ae;
     padding-left: 30px;
 }
 .content-panel#general {
