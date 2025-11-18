@@ -1163,7 +1163,7 @@ section {
     }
 
     .process-panel .process-card {
-        max-width: 500px;
+        max-width: 70vw;
     }
 }
 
