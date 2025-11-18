@@ -12,52 +12,81 @@ document.addEventListener("DOMContentLoaded", function() {
     gsap.ticker.lagSmoothing(0);
 
 
-    // --- 3. LÓGICA DE SEGMENTACIÓN (INTERACTIVA) ---
-    // (Tu código original - Está perfecto)
-    const cards = document.querySelectorAll(".card");
-    const panels = document.querySelectorAll(".content-panel");
-    const generalPanel = document.getElementById("general");
-    const contentSection = document.querySelector('.content-section');
-    let currentActivePanel = generalPanel;
+  // --- 3. LÓGICA ACORDEÓN SINCRONIZADO (CON REFRESH PARA STICKY) ---
+    
+    const accItems = document.querySelectorAll('.acc-item');
+    const featureImages = document.querySelectorAll('.feature-img');
 
-    cards.forEach(card => {
-        card.addEventListener("click", () => {
-            const targetId = card.dataset.target;
-            const targetPanel = document.getElementById(targetId);
+    if(accItems.length > 0 && featureImages.length > 0) {
+        
+        // Abrir el primero por defecto
+        gsap.set(accItems[0].querySelector('.acc-content'), { height: 'auto' });
+        gsap.set(featureImages[0], { autoAlpha: 1, scale: 1 });
 
-            cards.forEach(c => c.classList.remove("active"));
-            card.classList.add("active");
+        accItems.forEach((item, index) => {
+            const header = item.querySelector('.acc-header');
+            const content = item.querySelector('.acc-content');
 
-            if (targetPanel === currentActivePanel) return;
+            header.addEventListener('click', () => {
+                if (item.classList.contains('active')) return;
 
-            gsap.to(currentActivePanel, {
-                duration: 0.5,
-                height: 0,
-                autoAlpha: 0,
-                ease: "power3.inOut"
-            });
+                const currentActiveItem = document.querySelector('.acc-item.active');
+                const currentActiveContent = currentActiveItem ? currentActiveItem.querySelector('.acc-content') : null;
+                const currentActiveImg = document.querySelector('.feature-img.active');
 
-            gsap.fromTo(targetPanel, 
-                { height: 0, autoAlpha: 0 },
-                { 
-                    duration: 0.8,
-                    height: "auto",
-                    autoAlpha: 1,
-                    delay: 0.3,
-                    ease: "power3.out"
+                // 1. Cerrar anterior
+                if (currentActiveItem) {
+                    currentActiveItem.classList.remove('active');
+                    gsap.to(currentActiveContent, {
+                        height: 0,
+                        duration: 0.4,
+                        ease: "power2.inOut"
+                    });
                 }
-            );
 
-            currentActivePanel = targetPanel;
-            
-            lenis.scrollTo(contentSection, {
-                offset: -180,
-                duration: 1.2,
-                ease: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+                // 2. Ocultar imagen anterior
+                if (currentActiveImg) {
+                    currentActiveImg.classList.remove('active');
+                    gsap.to(currentActiveImg, {
+                        autoAlpha: 0,
+                        scale: 1.05,
+                        duration: 0.5,
+                        ease: "power2.in"
+                    });
+                }
+
+                // 3. Abrir nuevo
+                item.classList.add('active');
+                gsap.fromTo(content, 
+                    { height: 0 },
+                    { 
+                        height: 'auto', 
+                        duration: 0.6, 
+                        ease: "power2.out",
+                        // IMPORTANTE: Al terminar de abrir, refrescamos ScrollTrigger
+                        // Esto recalcula el sticky y el scroll de Lenis
+                        onComplete: () => {
+                            ScrollTrigger.refresh();
+                        }
+                    }
+                );
+
+                // 4. Mostrar nueva imagen
+                const nextImg = featureImages[index];
+                if (nextImg) {
+                    nextImg.classList.add('active');
+                    gsap.set(nextImg, { scale: 1.1 }); 
+                    gsap.to(nextImg, {
+                        autoAlpha: 1,
+                        scale: 1, 
+                        duration: 0.8,
+                        ease: "power2.out",
+                        delay: 0.1
+                    });
+                }
             });
         });
-    });
-
+    }
 
     // --- 4. ANIMACIONES DE SCROLL ---
     

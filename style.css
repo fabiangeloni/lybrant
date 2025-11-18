@@ -1202,5 +1202,202 @@ AÑADE ESTO AL FINAL DE TU 'style.css'
     text-shadow: 1px 1px 3px rgba(0,0,0,0.5); /* Sombra para mejor legibilidad */
 }
 
+/* --- NUEVA SECCIÓN INTERACTIVA (CORREGIDA PARA STICKY) --- */
+
+.interactive-feature-section {
+    background-color: var(--color-bg-secondary);
+    padding: 100px 0;
+    /* IMPORTANTE: Quitamos overflow: hidden para que funcione position: sticky */
+    overflow: visible; 
+    position: relative;
+}
+
+.feature-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.interactive-wrapper {
+    display: flex;
+    gap: 60px;
+    /* IMPORTANTE: align-items: flex-start es obligatorio para sticky en flexbox */
+    align-items: flex-start; 
+    position: relative;
+}
+
+/* Columna Izquierda: Acordeón */
+.accordion-column {
+    flex: 1; /* Ocupa el 50% */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    /* Aseguramos que tenga altura mínima para que el sticky tenga recorrido */
+    min-height: 600px; 
+}
+
+.acc-item {
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.acc-item.active {
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-md);
+}
+
+.acc-header {
+    padding: 25px 30px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 20px;
+    background: #fff;
+    transition: background-color 0.3s;
+}
+
+.acc-item.active .acc-header {
+    background-color: rgba(34, 120, 192, 0.03);
+}
+
+.acc-icon {
+    font-size: 1.5rem;
+    color: #3423ae;
+    width: 30px;
+    text-align: center;
+}
+
+.acc-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    flex-grow: 1;
+    color: var(--color-text-headings);
+}
+
+.acc-arrow {
+    color: #ccc;
+    transition: transform 0.4s ease;
+}
+
+.acc-item.active .acc-arrow {
+    transform: rotate(180deg);
+    color: var(--color-accent);
+}
+
+/* Contenido del Acordeón */
+.acc-content {
+    height: 0;
+    overflow: hidden;
+}
+
+.acc-content-inner {
+    padding: 0 30px 30px 80px;
+}
+
+.target-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-accent);
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.feature-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+
+.feature-checklist li {
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: var(--color-text);
+}
+
+.feature-checklist i {
+    color: var(--color-highlight);
+    margin-right: 10px;
+}
+
+.text-link {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #3423ae;
+    text-decoration: none;
+}
+
+/* --- COLUMNA DERECHA (STICKY) --- */
+.image-column {
+    flex: 1; /* Ocupa el otro 50% */
+    
+    /* AQUÍ ESTÁ LA MAGIA DEL STICKY */
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    
+    /* Calculamos altura del header (aprox 120px) + un espacio (40px) */
+    top: 160px; 
+    
+    /* Importante para que no se estire y pierda el efecto sticky */
+    height: fit-content; 
+    
+    z-index: 10;
+}
+
+.image-stack {
+    position: relative;
+    width: 100%;
+    /* Aspect Ratio cuadrado o 4:3 funciona mejor para sticky */
+    padding-top: 80%; 
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    background-color: #fff;
+}
+
+.feature-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    visibility: hidden;
+    /* Un scale inicial suave */
+    transform: scale(1.1); 
+}
+
+.feature-img.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1); /* El JS manejará la animación, esto es fallback */
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+    .interactive-feature-section {
+        overflow: hidden; /* En móvil sí podemos ocultar overflow */
+    }
+    .interactive-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .image-column {
+        display: none; /* Ocultamos imágenes en móvil para simplificar */
+    }
+
+    .acc-content-inner {
+        padding: 0 20px 25px 20px;
+    }
+    
+    .acc-icon {
+        display: none;
+    }
+}
 
 
