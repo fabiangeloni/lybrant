@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
 
     // --- 1. REGISTRAR PLUGINS DE GSAP ---
     gsap.registerPlugin(ScrollTrigger);
@@ -12,13 +12,13 @@ document.addEventListener("DOMContentLoaded", function() {
     gsap.ticker.lagSmoothing(0);
 
 
-  // --- 3. LÓGICA ACORDEÓN SINCRONIZADO (CON REFRESH PARA STICKY) ---
-    
+    // --- 3. LÓGICA ACORDEÓN SINCRONIZADO (CON REFRESH PARA STICKY) ---
+
     const accItems = document.querySelectorAll('.acc-item');
     const featureImages = document.querySelectorAll('.feature-img');
 
-    if(accItems.length > 0 && featureImages.length > 0) {
-        
+    if (accItems.length > 0 && featureImages.length > 0) {
+
         // Abrir el primero por defecto
         gsap.set(accItems[0].querySelector('.acc-content'), { height: 'auto' });
         gsap.set(featureImages[0], { autoAlpha: 1, scale: 1 });
@@ -57,11 +57,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 // 3. Abrir nuevo
                 item.classList.add('active');
-                gsap.fromTo(content, 
+                gsap.fromTo(content,
                     { height: 0 },
-                    { 
-                        height: 'auto', 
-                        duration: 0.6, 
+                    {
+                        height: 'auto',
+                        duration: 0.6,
                         ease: "power2.out",
                         // IMPORTANTE: Al terminar de abrir, refrescamos ScrollTrigger
                         // Esto recalcula el sticky y el scroll de Lenis
@@ -75,10 +75,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 const nextImg = featureImages[index];
                 if (nextImg) {
                     nextImg.classList.add('active');
-                    gsap.set(nextImg, { scale: 1.1 }); 
+                    gsap.set(nextImg, { scale: 1.1 });
                     gsap.to(nextImg, {
                         autoAlpha: 1,
-                        scale: 1, 
+                        scale: 1,
                         duration: 0.8,
                         ease: "power2.out",
                         delay: 0.1
@@ -89,15 +89,15 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // --- 4. ANIMACIONES DE SCROLL ---
-    
+
     // 4.1. Animación General de Carga
     gsap.from('body', { duration: 0.5, autoAlpha: 0, ease: 'power3.out' });
     gsap.from('.main-header', { duration: 1, yPercent: -100, autoAlpha: 0, ease: 'power3.out', delay: 0.1 });
-    gsap.from(".hero-content > *", { 
+    gsap.from(".hero-content > *", {
         duration: 1.2,
         y: 30,
         autoAlpha: 0,
-        stagger: 0.1, 
+        stagger: 0.1,
         delay: 0.4,
         ease: "power3.out"
     });
@@ -109,15 +109,15 @@ document.addEventListener("DOMContentLoaded", function() {
         delay: 0.6,
         ease: "power3.out"
     });
-    
+
     // 4.2. Animaciones por Media Query
-    
+
     ScrollTrigger.matchMedia({
 
         // ======================================================
         // 1. Configuración para DESKTOP (993px en adelante)
         // ======================================================
-        "(min-width: 993px)": function() {
+        "(min-width: 993px)": function () {
 
             // ==========================================================
             // --- PEGA EL NUEVO CÓDIGO AQUÍ ---
@@ -136,18 +136,35 @@ document.addEventListener("DOMContentLoaded", function() {
             // ==========================================================
             // --- FIN DEL NUEVO CÓDIGO ---
             // ==========================================================
-            
+
+            // --- Animación para la Sección Nosotros (About Us) ---
+            const teamCards = gsap.utils.toArray('.team-card');
+            if (teamCards.length > 0) {
+                gsap.from(teamCards, {
+                    scrollTrigger: {
+                        trigger: ".about-section",
+                        start: "top 80%",
+                        toggleActions: "play none none none"
+                    },
+                    y: 50,
+                    opacity: 0,
+                    duration: 1,
+                    stagger: 0.2,
+                    ease: "power3.out"
+                });
+            }
+
             // --- A) Animación simple de Fade-In para las secciones viejas ---
             // (Eliminamos la animación "Weave" que causaba conflictos)
             const sections = gsap.utils.toArray('main > section:not(.hero-section, .process-sticky-container)');
             sections.forEach((section) => {
                 const elements = section.querySelectorAll('h2, .section-subtitle, .splide, .cards-container, .content-panel#general, .service-list, .pre-footer-container, .main-footer .container');
                 if (elements.length === 0) return;
-                
+
                 gsap.from(elements, {
                     scrollTrigger: {
                         trigger: section,
-                        start: 'top 85%', 
+                        start: 'top 85%',
                         toggleActions: 'play none none none'
                     },
                     autoAlpha: 0,
@@ -162,12 +179,12 @@ document.addEventListener("DOMContentLoaded", function() {
             // ===================================================================
             // --- B) SCRIPT STICKY STACK (V7 - Arquitectura Correcta) ---
             // ===================================================================
-            
+
             const stickyPanels = gsap.utils.toArray(".process-panel");
             const allCards = stickyPanels.map(panel => panel.querySelector(".process-card"));
 
             if (allCards.length) {
-                
+
                 // NO NECESITAMOS 'gsap.set'.
                 // Todas las tarjetas están visibles por defecto.
                 // El CSS ('position: sticky') hace que el panel 2 tape al 1,
@@ -175,11 +192,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 // 1. Recorremos los paneles (empezando por el 2do, índice 1)
                 stickyPanels.forEach((panel, i) => {
-                    
+
                     if (i === 0) return; // Saltamos el primer panel
 
                     // Esta es la tarjeta que se quedará ATRÁS
-                    const prevCard = allCards[i - 1]; 
+                    const prevCard = allCards[i - 1];
 
                     // 2. Creamos un ScrollTrigger que se activa cuando el panel
                     // que ENTRA (el 'panel') empieza a tapar al anterior.
@@ -188,19 +205,19 @@ document.addEventListener("DOMContentLoaded", function() {
                         start: "top bottom", // Cuando el 'top' de este panel toca el 'bottom' de la ventana
                         end: "top top",      // Cuando el 'top' de este panel toca el 'top' de la ventana
                         scrub: 0.5,          // Suavidad
-                        
+
                         // markers: true,    // Descomenta esto para ver las guías
                         // id: `panel-out-${i}`,
 
                         // 3. En cada update del scroll, animamos la tarjeta ANTERIOR
                         onUpdate: (self) => {
                             // self.progress va de 0 a 1
-                            
+
                             // Escala: de 1 a 0.9
-                            let scale = 1 - (self.progress * 0.1); 
+                            let scale = 1 - (self.progress * 0.1);
                             // Opacidad: de 1 a 0.7
-                            let opacity = 1 ;
-                            
+                            let opacity = 1;
+
                             // Usamos gsap.to() para aplicar esto con suavidad
                             gsap.to(prevCard, {
                                 scale: scale,
@@ -218,14 +235,14 @@ document.addEventListener("DOMContentLoaded", function() {
         // ======================================================
         // 2. Configuración para MÓVIL (992px hacia abajo)
         // ======================================================
-        "(max-width: 992px)": function() {
-            
+        "(max-width: 992px)": function () {
+
             // En móvil, animamos todo con un fade-in simple
-            const allSections = gsap.utils.toArray('main > section'); 
-            
+            const allSections = gsap.utils.toArray('main > section');
+
             allSections.forEach((section) => {
                 const elementsToAnimate = section.querySelectorAll('h2, .section-subtitle, .splide, .card, .process-card, .service-item, .pre-footer-container h2, .pre-footer-container .subtitle, .main-footer p');
-                
+
                 if (elementsToAnimate.length === 0) return;
 
                 gsap.from(elementsToAnimate, {
@@ -244,15 +261,15 @@ document.addEventListener("DOMContentLoaded", function() {
         } // --- FIN de (max-width: 992px) ---
     }); // --- FIN de ScrollTrigger.matchMedia ---
 
-    
+
     // --- 5. SLIDER DE TESTIMONIOS (Splide.js) ---
     // (Tu código original - Está perfecto)
     if (typeof Splide !== 'undefined') {
         new Splide('#testimonial-slider', {
-            type   : 'loop',
+            type: 'loop',
             perPage: 2,
             perMove: 1,
-            gap    : '30px',
+            gap: '30px',
             pagination: true,
             arrows: true,
             breakpoints: {
@@ -296,25 +313,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     navOverlay.addEventListener('click', closeMenu);
 
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(event) {
-            
-            const href = this.getAttribute('href');
 
-            if (href === '#') {
-                event.preventDefault();
-                closeMenu();
-            } 
-            else {
-                event.preventDefault();
-                const destination = href;
-                closeMenu();
-                setTimeout(() => {
-                    window.location.href = destination;
-                }, 400); 
-            }
-        });
-    });
 
     // ... (Todo tu script.js existente)
 
@@ -400,7 +399,143 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    
+    // ===================================================================
+    // --- 8. EFECTO "SPOTLIGHT" CORREGIDO (Robustez total) ---
+    // ===================================================================
+
+    const teamWrapper = document.querySelector('.team-spotlight-wrapper');
+    const teamCards = document.querySelectorAll('.team-card');
+
+    if (teamWrapper && teamCards.length > 0) {
+
+        // Función para activar una tarjeta y desenfocar las demás
+        const activateCard = (activeCard) => {
+            teamCards.forEach(card => {
+                if (card === activeCard) {
+                    // ESTADO ACTIVO (La tarjeta que tiene el mouse)
+                    gsap.to(card, {
+                        scale: 1.05,
+                        opacity: 1,
+                        filter: "blur(0px)", // Forzamos nitidez
+                        boxShadow: "0 20px 50px rgba(48, 35, 174, 0.15)",
+                        duration: 0.4,
+                        ease: "power2.out",
+                        overwrite: "auto" // IMPORTANTE: Mata animaciones anteriores
+                    });
+
+                    // Animar el anillo interno
+                    gsap.to(card.querySelector('.img-gradient-ring'), {
+                        scale: 1.1,
+                        opacity: 1,
+                        duration: 0.4,
+                        overwrite: "auto"
+                    });
+
+                } else {
+                    // ESTADO INACTIVO (Las otras tarjetas)
+                    gsap.to(card, {
+                        scale: 0.95,
+                        opacity: 0.5,
+                        filter: "blur(4px)", // Aplicamos blur
+                        boxShadow: "none",
+                        duration: 0.4,
+                        ease: "power2.out",
+                        overwrite: "auto" // IMPORTANTE: Mata animaciones anteriores
+                    });
+
+                    // Apagar el anillo interno
+                    gsap.to(card.querySelector('.img-gradient-ring'), {
+                        scale: 1,
+                        opacity: 0.5,
+                        duration: 0.4,
+                        overwrite: "auto"
+                    });
+                }
+            });
+        };
+
+        // Función para resetear todo (cuando el mouse sale de la sección)
+        const resetCards = () => {
+            teamCards.forEach(card => {
+                gsap.to(card, {
+                    scale: 1,
+                    opacity: 1,
+                    filter: "blur(0px)",
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
+                    duration: 0.5,
+                    ease: "power2.out",
+                    overwrite: "auto"
+                });
+
+                gsap.to(card.querySelector('.img-gradient-ring'), {
+                    scale: 1,
+                    opacity: 0.8,
+                    duration: 0.5,
+                    overwrite: "auto"
+                });
+            });
+        };
+
+        // --- EVENT LISTENERS ---
+
+        teamCards.forEach(card => {
+            // Usamos mouseenter en cada tarjeta individualmente
+            card.addEventListener('mouseenter', () => activateCard(card));
+        });
+
+        // Usamos mouseleave en el WRAPPER (contenedor padre)
+        // Esto evita parpadeos si hay espacio entre las tarjetas
+        teamWrapper.addEventListener('mouseleave', resetCards);
+    }
+
+    // ===================================================================
+    // --- 9. SCROLL SUAVE INTERNO (Compatible con Lenis y Mobile) ---
+    // ===================================================================
+
+    const allAnchorLinks = document.querySelectorAll('a[href^="#"]');
+
+    allAnchorLinks.forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            // 1. Evitar el salto brusco del navegador
+            e.preventDefault();
+
+            const targetId = this.getAttribute('href');
+
+            // Si es solo "#" (ej: enlace vacío), no hacemos nada
+            if (targetId === '#') return;
+
+            const targetElement = document.querySelector(targetId);
+
+            if (targetElement) {
+                // 2. Si el menú móvil está abierto, lo cerramos primero
+                if (document.body.classList.contains('nav-active')) {
+                    closeMenu(); // Usamos tu función existente
+                }
+
+                // 3. Usamos Lenis para ir al destino suavemente
+                // 'offset: -100' deja espacio para que el Header fijo no tape el título
+                // 3. Usamos Lenis para ir al destino suavemente
+                if (targetElement) {
+                    // ... (código de cerrar menú igual que antes) ...
+                    if (document.body.classList.contains('nav-active')) {
+                        closeMenu();
+                    }
+
+                    lenis.scrollTo(targetElement, {
+                        offset: -100,
+                        duration: 2.0, // Aumentamos un poco la duración para apreciar el efecto "suave-rápido-suave"
+
+                        // ESTA ES LA FÓRMULA MÁGICA (Ease In Out Cubic)
+                        easing: (t) => {
+                            return t < 0.5
+                                ? 4 * t * t * t
+                                : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                        }
+                    });
+                }
+            }
+        });
+    });
 
 }); // <-- ESTE ES EL '});' DE CIERRE ORIGINAL DE TU ARCHIVO DOMContentLoaded
 
