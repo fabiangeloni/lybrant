@@ -1297,7 +1297,13 @@ section {
 
 /* --- 17. TECH STACK BAR (NUEVO) --- */
 .tech-stack-bar {
-    display: none;
+    background-color: #FFFFFF;
+    padding: 30px 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    position: relative;
+    z-index: 9;
+    /* Justo debajo del Hero, encima de fondos simples */
 }
 
 .stack-label {
@@ -1343,12 +1349,9 @@ section {
 
 /* Ajuste para Móviles */
 @media (max-width: 768px) {
-    .logo-grid {
-        gap: 20px 30px;
+    .tech-stack-bar {
+        display: none;
     }
 
-    .tech-logo {
-        height: 28px;
-        /* Logos un poco más chicos en celular */
-    }
+
 }
