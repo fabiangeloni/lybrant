@@ -1,25 +1,32 @@
 document.addEventListener("DOMContentLoaded", function () {
 
+
     // =================================================================
-    // BLOQUE 1: INICIALIZACIÓN DE MOTORES
+    // BLOQUE 1: INICIALIZACIÓN DE MOTORES (OPTIMIZADO)
     // =================================================================
     gsap.registerPlugin(ScrollTrigger);
 
-    // Configuración Lenis (Híbrida)
-    const lenis = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        direction: 'vertical',
-        smooth: true,        // PC: Suave
-        smoothTouch: false,  // MÓVIL: Nativo (Vital para que se sienta bien el dedo)
-        touchMultiplier: 2,
-    });
+    // Detección real de Móvil (Touch)
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 993;
 
-    lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((time) => {
-        lenis.raf(time * 1000);
-    });
-    gsap.ticker.lagSmoothing(0);
+    let lenis; // Declaramos fuera
+
+    if (!isMobile) {
+        // SOLO activamos Lenis en PC
+        lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            direction: 'vertical',
+            smooth: true,
+        });
+
+        // Conexión Lenis <-> ScrollTrigger (Solo PC)
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => {
+            lenis.raf(time * 1000);
+        });
+        gsap.ticker.lagSmoothing(0);
+    }
 
     // =================================================================
     // BLOQUE 2: ANIMACIONES GLOBALES
