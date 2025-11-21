@@ -45,6 +45,8 @@ body.nav-active {
     /* Previene scroll cuando el menú móvil está abierto */
 }
 
+
+
 .container {
     max-width: 980px;
     margin: 0 auto;
@@ -1567,5 +1569,6 @@ section {
     justify-content: flex-start;
     gap: 0.5rem;
 }
+
 
 /* Si tu Hero tiene fondo oscuro, cambia el color a: color: #ccc; */
