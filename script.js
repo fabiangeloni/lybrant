@@ -1,541 +1,285 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    // --- 1. REGISTRAR PLUGINS DE GSAP ---
+    // =================================================================
+    // BLOQUE 1: INICIALIZACIÓN
+    // =================================================================
     gsap.registerPlugin(ScrollTrigger);
 
-    // --- 2. CONFIGURACIÓN DE SCROLL SUAVE (LENIS) + INTEGRACIÓN GSAP ---
-    const lenis = new Lenis();
+    const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smooth: true
+    });
+
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add((time) => {
-        lenis.raf(time * 1500);
+        lenis.raf(time * 1000);
     });
     gsap.ticker.lagSmoothing(0);
 
+    // =================================================================
+    // BLOQUE 2: ANIMACIONES GLOBALES
+    // =================================================================
 
-    // --- 3. LÓGICA ACORDEÓN SINCRONIZADO (CON REFRESH PARA STICKY) ---
+    // 2.1 Intro
+    const tlIntro = gsap.timeline();
+    tlIntro.from('body', { autoAlpha: 0, duration: 0.5 })
+        .from('.main-header', { yPercent: -100, autoAlpha: 0, duration: 0.8, ease: 'power3.out' }, "-=0.2")
+        .from(".hero-content > *", { y: 30, autoAlpha: 0, stagger: 0.1, duration: 1, ease: "power3.out" }, "-=0.4")
+        .from(".hero-video", { x: 50, autoAlpha: 0, duration: 1, ease: "power3.out" }, "-=0.8");
 
-    const accItems = document.querySelectorAll('.acc-item');
-    const featureImages = document.querySelectorAll('.feature-img');
-
-    if (accItems.length > 0 && featureImages.length > 0) {
-
-        // Abrir el primero por defecto
-        gsap.set(accItems[0].querySelector('.acc-content'), { height: 'auto' });
-        gsap.set(featureImages[0], { autoAlpha: 1, scale: 1 });
-
-        accItems.forEach((item, index) => {
-            const header = item.querySelector('.acc-header');
-            const content = item.querySelector('.acc-content');
-
-            header.addEventListener('click', () => {
-                if (item.classList.contains('active')) return;
-
-                const currentActiveItem = document.querySelector('.acc-item.active');
-                const currentActiveContent = currentActiveItem ? currentActiveItem.querySelector('.acc-content') : null;
-                const currentActiveImg = document.querySelector('.feature-img.active');
-
-                // 1. Cerrar anterior
-                if (currentActiveItem) {
-                    currentActiveItem.classList.remove('active');
-                    gsap.to(currentActiveContent, {
-                        height: 0,
-                        duration: 0.4,
-                        ease: "power2.inOut"
-                    });
-                }
-
-                // 2. Ocultar imagen anterior
-                if (currentActiveImg) {
-                    currentActiveImg.classList.remove('active');
-                    gsap.to(currentActiveImg, {
-                        autoAlpha: 0,
-                        scale: 1.05,
-                        duration: 0.5,
-                        ease: "power2.in"
-                    });
-                }
-
-                // 3. Abrir nuevo
-                item.classList.add('active');
-                gsap.fromTo(content,
-                    { height: 0 },
-                    {
-                        height: 'auto',
-                        duration: 0.6,
-                        ease: "power2.out",
-                        // IMPORTANTE: Al terminar de abrir, refrescamos ScrollTrigger
-                        // Esto recalcula el sticky y el scroll de Lenis
-                        onComplete: () => {
-                            ScrollTrigger.refresh();
-                        }
-                    }
-                );
-
-                // 4. Mostrar nueva imagen
-                const nextImg = featureImages[index];
-                if (nextImg) {
-                    nextImg.classList.add('active');
-                    gsap.set(nextImg, { scale: 1.1 });
-                    gsap.to(nextImg, {
-                        autoAlpha: 1,
-                        scale: 1,
-                        duration: 0.8,
-                        ease: "power2.out",
-                        delay: 0.1
-                    });
-                }
-            });
+    // 2.2 Tech Stack
+    const techBar = document.querySelector('.tech-stack-bar');
+    if (techBar) {
+        gsap.from(".tech-stack-bar", {
+            scrollTrigger: { trigger: ".tech-stack-bar", start: "top 95%" },
+            y: 20, opacity: 0, duration: 0.8, ease: "power2.out"
+        });
+        gsap.from(".tech-logo", {
+            scrollTrigger: { trigger: ".tech-stack-bar", start: "top 95%" },
+            y: 20, opacity: 0, duration: 0.6, stagger: 0.1, ease: "back.out(1.7)", delay: 0.2
         });
     }
 
-    // --- 4. ANIMACIONES DE SCROLL ---
-
-    // 4.1. Animación General de Carga
-    gsap.from('body', { duration: 0.5, autoAlpha: 0, ease: 'power3.out' });
-    gsap.from('.main-header', { duration: 1, yPercent: -100, autoAlpha: 0, ease: 'power3.out', delay: 0.1 });
-    gsap.from(".hero-content > *", {
-        duration: 1.2,
-        y: 30,
-        autoAlpha: 0,
-        stagger: 0.1,
-        delay: 0.4,
-        ease: "power3.out"
-    });
-
-    gsap.from(".hero-video", {
-        duration: 1.2,
-        x: 50,
-        autoAlpha: 0,
-        delay: 0.6,
-        ease: "power3.out"
-    });
-
-    // 4.2. Animaciones por Media Query
-
+    // =================================================================
+    // BLOQUE 3: RESPONSIVE
+    // =================================================================
     ScrollTrigger.matchMedia({
-
-        // ======================================================
-        // 1. Configuración para DESKTOP (993px en adelante)
-        // ======================================================
         "(min-width: 993px)": function () {
-
-            // ==========================================================
-            // --- PEGA EL NUEVO CÓDIGO AQUÍ ---
-            // ==========================================================
-            // Efecto Parallax para el Hero
+            // Parallax
             gsap.to(".hero-content, .hero-video", {
-                yPercent: 70, // <-- Mueve 30% hacia abajo (scroll más lento)
-                ease: "none", // Lineal, sin aceleración
-                scrollTrigger: {
-                    trigger: ".hero-section", // El trigger es el hero
-                    start: "top top", // Empieza cuando el hero toca el top
-                    end: "bottom top", // Termina cuando el hero sale por el top
-                    scrub: true       // ¡La magia! Conecta la animación al scroll
-                }
-            });
-            // ==========================================================
-            // --- FIN DEL NUEVO CÓDIGO ---
-            // ==========================================================
-
-            // --- Animación para la Sección Nosotros (About Us) ---
-            const teamCards = gsap.utils.toArray('.team-card');
-            if (teamCards.length > 0) {
-                gsap.from(teamCards, {
-                    scrollTrigger: {
-                        trigger: ".about-section",
-                        start: "top 80%",
-                        toggleActions: "play none none none"
-                    },
-                    y: 50,
-                    opacity: 0,
-                    duration: 1,
-                    stagger: 0.2,
-                    ease: "power3.out"
-                });
-            }
-
-            // --- A) Animación simple de Fade-In para las secciones viejas ---
-            // (Eliminamos la animación "Weave" que causaba conflictos)
-            const sections = gsap.utils.toArray('main > section:not(.hero-section, .process-sticky-container)');
-            sections.forEach((section) => {
-                const elements = section.querySelectorAll('h2, .section-subtitle, .splide, .cards-container, .content-panel#general, .service-list, .pre-footer-container, .main-footer .container');
-                if (elements.length === 0) return;
-
-                gsap.from(elements, {
-                    scrollTrigger: {
-                        trigger: section,
-                        start: 'top 85%',
-                        toggleActions: 'play none none none'
-                    },
-                    autoAlpha: 0,
-                    y: 30,
-                    stagger: 0.05,
-                    duration: 1,
-                    ease: 'power3.out'
-                });
+                yPercent: 50, ease: "none",
+                scrollTrigger: { trigger: ".hero-section", start: "top top", end: "bottom top", scrub: true }
             });
 
-
-            // ===================================================================
-            // --- B) SCRIPT STICKY STACK (V7 - Arquitectura Correcta) ---
-            // ===================================================================
-
-            const stickyPanels = gsap.utils.toArray(".process-panel");
-            const allCards = stickyPanels.map(panel => panel.querySelector(".process-card"));
-
-            if (allCards.length) {
-
-                // NO NECESITAMOS 'gsap.set'.
-                // Todas las tarjetas están visibles por defecto.
-                // El CSS ('position: sticky') hace que el panel 2 tape al 1,
-                // el 3 al 2, etc.
-
-                // 1. Recorremos los paneles (empezando por el 2do, índice 1)
-                stickyPanels.forEach((panel, i) => {
-
-                    if (i === 0) return; // Saltamos el primer panel
-
-                    // Esta es la tarjeta que se quedará ATRÁS
-                    const prevCard = allCards[i - 1];
-
-                    // 2. Creamos un ScrollTrigger que se activa cuando el panel
-                    // que ENTRA (el 'panel') empieza a tapar al anterior.
+            // Sticky Process
+            const panels = gsap.utils.toArray(".process-panel");
+            if (panels.length > 0) {
+                panels.forEach((panel, i) => {
+                    if (i === 0) return;
+                    const prevCard = panels[i - 1].querySelector(".process-card");
                     ScrollTrigger.create({
-                        trigger: panel,      // El trigger es el panel que entra (2, 3, 4)
-                        start: "top bottom", // Cuando el 'top' de este panel toca el 'bottom' de la ventana
-                        end: "top top",      // Cuando el 'top' de este panel toca el 'top' de la ventana
-                        scrub: 0.5,          // Suavidad
-
-                        // markers: true,    // Descomenta esto para ver las guías
-                        // id: `panel-out-${i}`,
-
-                        // 3. En cada update del scroll, animamos la tarjeta ANTERIOR
+                        trigger: panel, start: "top bottom", end: "top top", scrub: true,
                         onUpdate: (self) => {
-                            // self.progress va de 0 a 1
-
-                            // Escala: de 1 a 0.9
-                            let scale = 1 - (self.progress * 0.1);
-                            // Opacidad: de 1 a 0.7
-                            let opacity = 1;
-
-                            // Usamos gsap.to() para aplicar esto con suavidad
-                            gsap.to(prevCard, {
-                                scale: scale,
-                                autoAlpha: opacity,
-                                ease: "none",
-                                duration: 0.05 // Un 'duration' bajo lo hace instantáneo al scrub
-                            });
+                            if (prevCard) gsap.to(prevCard, { scale: 1 - (self.progress * 0.1), opacity: 1 - (self.progress * 0.3), overwrite: 'auto', duration: 0.1 });
                         }
                     });
                 });
-            } // fin del if(allCards.length)
-
-        }, // --- FIN de (min-width: 993px) ---
-
-        // ======================================================
-        // 2. Configuración para MÓVIL (992px hacia abajo)
-        // ======================================================
-        "(max-width: 992px)": function () {
-
-            // En móvil, animamos todo con un fade-in simple
-            const allSections = gsap.utils.toArray('main > section');
-
-            allSections.forEach((section) => {
-                const elementsToAnimate = section.querySelectorAll('h2, .section-subtitle, .splide, .card, .process-card, .service-item, .pre-footer-container h2, .pre-footer-container .subtitle, .main-footer p');
-
-                if (elementsToAnimate.length === 0) return;
-
-                gsap.from(elementsToAnimate, {
-                    scrollTrigger: {
-                        trigger: section,
-                        start: 'top 90%',
-                        toggleActions: 'play none none none'
-                    },
-                    autoAlpha: 0,
-                    y: 40,
-                    duration: 0.8,
-                    stagger: 0.1,
-                    ease: 'power3.out'
-                });
-            });
-        } // --- FIN de (max-width: 992px) ---
-    }); // --- FIN de ScrollTrigger.matchMedia ---
-
-
-    // --- 5. SLIDER DE TESTIMONIOS (Splide.js) ---
-    // (Tu código original - Está perfecto)
-    if (typeof Splide !== 'undefined') {
-        new Splide('#testimonial-slider', {
-            type: 'loop',
-            perPage: 2,
-            perMove: 1,
-            gap: '30px',
-            pagination: true,
-            arrows: true,
-            breakpoints: {
-                992: { perPage: 1 },
-                600: { perPage: 1, arrows: false }
             }
-        }).mount();
-    }
 
-    // --- 6. NAVEGACIÓN MÓVIL ---
-    // (Tu código original - Está perfecto)
-    const navToggle = document.querySelector('.nav-toggle');
-    const mainNav = document.querySelector('.main-nav');
-    const navOverlay = document.querySelector('.nav-overlay');
-    const navLinks = document.querySelectorAll('.main-nav a');
-    const body = document.body;
-
-    function openMenu() {
-        navToggle.classList.add('is-active');
-        mainNav.classList.add('is-active');
-        navOverlay.classList.add('is-active');
-        body.classList.add('nav-active');
-        navToggle.setAttribute('aria-expanded', 'true');
-    }
-
-    function closeMenu() {
-        navToggle.classList.remove('is-active');
-        mainNav.classList.remove('is-active');
-        navOverlay.classList.remove('is-active');
-        body.classList.remove('nav-active');
-        navToggle.setAttribute('aria-expanded', 'false');
-    }
-
-    navToggle.addEventListener('click', () => {
-        if (mainNav.classList.contains('is-active')) {
-            closeMenu();
-        } else {
-            openMenu();
+            // Fade In General
+            const sections = gsap.utils.toArray('section:not(.hero-section):not(.process-sticky-container):not(.metrics-section):not(.services-section)');
+            sections.forEach(section => {
+                const elems = section.querySelectorAll('h2, .section-subtitle');
+                if (elems.length > 0) gsap.from(elems, { scrollTrigger: { trigger: section, start: "top 80%" }, y: 30, autoAlpha: 0, stagger: 0.1, duration: 0.8, ease: "power2.out" });
+            });
+        },
+        "(max-width: 992px)": function () {
+            const allSections = gsap.utils.toArray('main > section');
+            allSections.forEach(section => {
+                const elementsToAnimate = section.querySelectorAll('h2, .section-subtitle, .card, img');
+                if (elementsToAnimate.length > 0) gsap.from(elementsToAnimate, { scrollTrigger: { trigger: section, start: "top 85%" }, y: 30, autoAlpha: 0, stagger: 0.1, duration: 0.6 });
+            });
         }
     });
 
-    navOverlay.addEventListener('click', closeMenu);
+    // =================================================================
+    // BLOQUE 4: FUNCIONALIDADES ESPECÍFICAS
+    // =================================================================
 
-
-
-    // ... (Todo tu script.js existente)
-
-    // --- 7. PARTÍCULAS EN EL FORMULARIO DE CONTACTO (tsParticles) ---
-    // (Asegúrate de que el script de tsParticles esté cargado en tu HTML antes de este)
-    if (typeof tsParticles !== 'undefined') {
-        tsParticles.load({
-            id: "tsparticles-background", // El ID del div que creamos en el HTML
-            options: {
-                background: {
-                    color: {
-                        value: "transparent", // El fondo ya lo da tu CSS de .pre-footer-container
-                    },
-                },
-                fpsLimit: 60,
-                interactivity: {
-                    events: {
-                        onClick: {
-                            enable: false, // No queremos que reaccionen al click
-                            mode: "push",
-                        },
-                        onHover: {
-                            enable: false, // No queremos que reaccionen al hover
-                            mode: "grab",
-                        },
-                        resize: true,
-                    },
-                    modes: {
-                        push: {
-                            quantity: 4,
-                        },
-                        grab: {
-                            distance: 150,
-                            links: {
-                                opacity: 1,
-                            },
-                        },
-                    },
-                },
-                particles: {
-                    color: {
-                        value: "#ffffff", // Color de las partículas (blanco)
-                    },
-                    links: {
-                        color: "#ffffff", // Color de las líneas entre partículas (blanco)
-                        distance: 150,
-                        enable: true,
-                        opacity: 0.3, // Líneas semi-transparentes
-                        width: 1,
-                    },
-                    collisions: {
-                        enable: false,
-                    },
-                    move: {
-                        direction: "none",
-                        enable: true,
-                        outModes: {
-                            default: "bounce",
-                        },
-                        random: true, // Movimiento aleatorio
-                        speed: 0.5,   // MUY LENTO
-                        straight: false,
-                    },
-                    number: {
-                        density: {
-                            enable: true,
-                            area: 800,
-                        },
-                        value: 80, // Número de partículas
-                    },
-                    opacity: {
-                        value: 0.5, // Opacidad de las partículas
-                    },
-                    shape: {
-                        type: "circle", // Forma de las partículas
-                    },
-                    size: {
-                        value: { min: 1, max: 3 }, // Tamaño de las partículas
-                    },
-                },
-                detectRetina: true,
-            },
+    // 4.1 Acordeón
+    const accItems = document.querySelectorAll('.acc-item');
+    const featureImages = document.querySelectorAll('.feature-img');
+    if (accItems.length > 0) {
+        gsap.set(accItems[0].querySelector('.acc-content'), { height: 'auto' });
+        if (featureImages[0]) gsap.set(featureImages[0], { autoAlpha: 1, scale: 1 });
+        accItems.forEach((item, index) => {
+            item.querySelector('.acc-header').addEventListener('click', () => {
+                if (item.classList.contains('active')) return;
+                const activeItem = document.querySelector('.acc-item.active');
+                if (activeItem) {
+                    activeItem.classList.remove('active');
+                    gsap.to(activeItem.querySelector('.acc-content'), { height: 0, duration: 0.4 });
+                }
+                const activeImg = document.querySelector('.feature-img.active');
+                if (activeImg) {
+                    activeImg.classList.remove('active');
+                    gsap.to(activeImg, { autoAlpha: 0, scale: 1.05, duration: 0.4 });
+                }
+                item.classList.add('active');
+                gsap.to(item.querySelector('.acc-content'), { height: 'auto', duration: 0.6, ease: 'power2.out', onComplete: () => ScrollTrigger.refresh() });
+                const nextImg = featureImages[index];
+                if (nextImg) {
+                    nextImg.classList.add('active');
+                    gsap.fromTo(nextImg, { autoAlpha: 0, scale: 1.1 }, { autoAlpha: 1, scale: 1, duration: 0.6 });
+                }
+            });
         });
     }
 
-    // ===================================================================
-    // --- 8. EFECTO "SPOTLIGHT" CORREGIDO (Robustez total) ---
-    // ===================================================================
+    // 4.2 MÉTRICAS NIVEL DIOS (3D REAL HABILITADO)
+    const metricsSection = document.querySelector('.metrics-section');
+    if (metricsSection) {
+        const metricCards = document.querySelectorAll('.metric-card');
 
-    const teamWrapper = document.querySelector('.team-spotlight-wrapper');
-    const teamCards = document.querySelectorAll('.team-card');
+        // Entrada
+        gsap.from(metricCards, {
+            scrollTrigger: { trigger: ".metrics-section", start: "top 85%", toggleActions: "play none none none" },
+            y: 50, opacity: 0, duration: 0.8, stagger: 0.2, ease: "back.out(1.5)"
+        });
 
-    if (teamWrapper && teamCards.length > 0) {
+        // Contadores
+        document.querySelectorAll('.metric-number').forEach(counter => {
+            let target = parseFloat(counter.getAttribute('data-target'));
+            let proxy = { val: (target === 0) ? 10 : 0 };
+            gsap.to(proxy, {
+                val: target, duration: 2, ease: "power2.out",
+                scrollTrigger: { trigger: ".metrics-section", start: "top 85%" },
+                onUpdate: () => {
+                    let decimals = counter.getAttribute('data-decimals') ? 1 : 0;
+                    let prefix = counter.getAttribute('data-prefix') || '';
+                    let suffix = counter.getAttribute('data-suffix') || '';
+                    let num = proxy.val.toFixed(decimals);
+                    if (num.endsWith('.0')) num = parseInt(num);
+                    counter.innerText = prefix + num + suffix;
+                }
+            });
+        });
 
-        // Función para activar una tarjeta y desenfocar las demás
-        const activateCard = (activeCard) => {
-            teamCards.forEach(card => {
-                if (card === activeCard) {
-                    // ESTADO ACTIVO (La tarjeta que tiene el mouse)
+        // --- LÓGICA 3D TILT ---
+        if (window.matchMedia("(min-width: 993px)").matches) {
+            metricCards.forEach(card => {
+
+                // 1. CONFIGURACIÓN INICIAL 3D (Vital)
+                // Esto le dice a GSAP: "Prepara este elemento para moverse en 3D con profundidad 1000"
+                gsap.set(card, { transformPerspective: 1000, transformStyle: "preserve-3d" });
+
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+
+                    // Ángulos aumentados para visibilidad (20 grados)
+                    const rotateX = ((y - centerY) / centerY) * -3;
+                    const rotateY = ((x - centerX) / centerX) * 3;
+
+                    // Animación rápida y directa
                     gsap.to(card, {
-                        scale: 1.05,
-                        opacity: 1,
-                        filter: "blur(0px)", // Forzamos nitidez
-                        boxShadow: "0 20px 50px rgba(48, 35, 174, 0.15)",
-                        duration: 0.4,
-                        ease: "power2.out",
-                        overwrite: "auto" // IMPORTANTE: Mata animaciones anteriores
-                    });
-
-                    // Animar el anillo interno
-                    gsap.to(card.querySelector('.img-gradient-ring'), {
-                        scale: 1.1,
-                        opacity: 1,
-                        duration: 0.4,
+                        rotationX: rotateX, // GSAP usa rotationX, no rotateX
+                        rotationY: rotateY,
+                        scale: 1.02, // Zoom visible
+                        duration: 0.1, // Respuesta casi instantánea
+                        ease: "power1.out",
                         overwrite: "auto"
                     });
 
-                } else {
-                    // ESTADO INACTIVO (Las otras tarjetas)
-                    gsap.to(card, {
-                        scale: 0.95,
-                        opacity: 0.5,
-                        filter: "blur(4px)", // Aplicamos blur
-                        boxShadow: "none",
-                        duration: 0.4,
-                        ease: "power2.out",
-                        overwrite: "auto" // IMPORTANTE: Mata animaciones anteriores
-                    });
+                    const shine = card.querySelector('.card-shine');
+                    if (shine) shine.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.25), transparent 60%)`;
+                });
 
-                    // Apagar el anillo interno
-                    gsap.to(card.querySelector('.img-gradient-ring'), {
+                card.addEventListener('mouseleave', () => {
+                    // Retorno suave al centro
+                    gsap.to(card, {
+                        rotationX: 0,
+                        rotationY: 0,
                         scale: 1,
-                        opacity: 0.5,
-                        duration: 0.4,
+                        duration: 0.8,
+                        ease: "elastic.out(1, 0.5)",
                         overwrite: "auto"
                     });
-                }
-            });
-        };
-
-        // Función para resetear todo (cuando el mouse sale de la sección)
-        const resetCards = () => {
-            teamCards.forEach(card => {
-                gsap.to(card, {
-                    scale: 1,
-                    opacity: 1,
-                    filter: "blur(0px)",
-                    boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
-                    duration: 0.5,
-                    ease: "power2.out",
-                    overwrite: "auto"
-                });
-
-                gsap.to(card.querySelector('.img-gradient-ring'), {
-                    scale: 1,
-                    opacity: 0.8,
-                    duration: 0.5,
-                    overwrite: "auto"
                 });
             });
-        };
-
-        // --- EVENT LISTENERS ---
-
-        teamCards.forEach(card => {
-            // Usamos mouseenter en cada tarjeta individualmente
-            card.addEventListener('mouseenter', () => activateCard(card));
-        });
-
-        // Usamos mouseleave en el WRAPPER (contenedor padre)
-        // Esto evita parpadeos si hay espacio entre las tarjetas
-        teamWrapper.addEventListener('mouseleave', resetCards);
+        }
     }
 
-    // ===================================================================
-    // --- 9. SCROLL SUAVE INTERNO (Compatible con Lenis y Mobile) ---
-    // ===================================================================
+    // 4.3 Servicios Focus
+    const serviceItems = document.querySelectorAll('.service-item');
+    if (serviceItems.length > 0) {
+        serviceItems.forEach((item) => {
+            ScrollTrigger.create({
+                trigger: item, start: "top 70%", end: "bottom 30%",
+                onEnter: () => item.classList.add('active'),
+                onLeave: () => item.classList.remove('active'),
+                onEnterBack: () => item.classList.add('active'),
+                onLeaveBack: () => item.classList.remove('active')
+            });
+        });
+    }
 
-    const allAnchorLinks = document.querySelectorAll('a[href^="#"]');
-
-    allAnchorLinks.forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            // 1. Evitar el salto brusco del navegador
-            e.preventDefault();
-
-            const targetId = this.getAttribute('href');
-
-            // Si es solo "#" (ej: enlace vacío), no hacemos nada
-            if (targetId === '#') return;
-
-            const targetElement = document.querySelector(targetId);
-
-            if (targetElement) {
-                // 2. Si el menú móvil está abierto, lo cerramos primero
-                if (document.body.classList.contains('nav-active')) {
-                    closeMenu(); // Usamos tu función existente
-                }
-
-                // 3. Usamos Lenis para ir al destino suavemente
-                // 'offset: -100' deja espacio para que el Header fijo no tape el título
-                // 3. Usamos Lenis para ir al destino suavemente
-                if (targetElement) {
-                    // ... (código de cerrar menú igual que antes) ...
-                    if (document.body.classList.contains('nav-active')) {
-                        closeMenu();
+    // 4.4 Equipo
+    const teamWrapper = document.querySelector('.team-spotlight-wrapper');
+    if (teamWrapper) {
+        const cards = teamWrapper.querySelectorAll('.team-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                cards.forEach(c => {
+                    if (c === card) {
+                        gsap.to(c, { scale: 1.05, opacity: 1, filter: 'blur(0px)', duration: 0.4 });
+                        gsap.to(c.querySelector('.img-gradient-ring'), { scale: 1.1, opacity: 1, duration: 0.4 });
+                    } else {
+                        gsap.to(c, { scale: 0.95, opacity: 0.5, filter: 'blur(4px)', duration: 0.4 });
+                        gsap.to(c.querySelector('.img-gradient-ring'), { scale: 1, opacity: 0.5, duration: 0.4 });
                     }
+                });
+            });
+        });
+        teamWrapper.addEventListener('mouseleave', () => {
+            cards.forEach(c => {
+                gsap.to(c, { scale: 1, opacity: 1, filter: 'blur(0px)', duration: 0.4 });
+                gsap.to(c.querySelector('.img-gradient-ring'), { scale: 1, opacity: 0.8, duration: 0.4 });
+            });
+        });
+    }
 
-                    lenis.scrollTo(targetElement, {
-                        offset: -100,
-                        duration: 2.0, // Aumentamos un poco la duración para apreciar el efecto "suave-rápido-suave"
+    // =================================================================
+    // BLOQUE 5: UI
+    // =================================================================
 
-                        // ESTA ES LA FÓRMULA MÁGICA (Ease In Out Cubic)
-                        easing: (t) => {
-                            return t < 0.5
-                                ? 4 * t * t * t
-                                : 1 - Math.pow(-2 * t + 2, 3) / 2;
-                        }
-                    });
-                }
+    // Menú
+    const navToggle = document.querySelector('.nav-toggle');
+    if (navToggle) {
+        navToggle.addEventListener('click', () => {
+            document.body.classList.toggle('nav-active');
+            document.querySelector('.main-nav').classList.toggle('is-active');
+            document.querySelector('.nav-overlay').classList.toggle('is-active');
+            navToggle.classList.toggle('is-active');
+        });
+        document.querySelector('.nav-overlay').addEventListener('click', () => navToggle.click());
+    }
+
+    // Links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                if (document.body.classList.contains('nav-active')) navToggle.click();
+                lenis.scrollTo(target, { offset: -100, duration: 1.5 });
             }
         });
     });
 
-}); // <-- ESTE ES EL '});' DE CIERRE ORIGINAL DE TU ARCHIVO DOMContentLoaded
+    // Partículas
+    if (typeof tsParticles !== 'undefined' && document.getElementById("tsparticles-background")) {
+        tsParticles.load({
+            id: "tsparticles-background",
+            options: {
+                background: { color: "transparent" },
+                particles: {
+                    color: { value: "#ffffff" },
+                    links: { enable: true, color: "#ffffff", opacity: 0.3 },
+                    move: { enable: true, speed: 0.5 },
+                    number: { value: 60 },
+                    opacity: { value: 0.5 },
+                    size: { value: { min: 1, max: 3 } }
+                }
+            }
+        });
+    }
 
+    setTimeout(() => { ScrollTrigger.refresh(); }, 500);
+
+});

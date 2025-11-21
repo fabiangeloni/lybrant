@@ -70,7 +70,6 @@ h1 {
 h2 {
     font-size: 2.25rem;
     text-align: center;
-    margin-bottom: 40px;
     color: #3423ae;
 }
 
@@ -575,55 +574,112 @@ section {
 
 
 /* --- 10. SERVICIOS --- */
+/* --- 10. SERVICIOS (FOCUS REVEAL) --- */
 .services-section {
-    background-color: var(--color-bg-secondary);
+    background-color: #ffffff;
+    /* O un gris muy muy suave #fcfcfc */
     position: relative;
     z-index: 5;
+    padding: 120px 0;
 }
 
 .service-list {
     display: flex;
     flex-direction: column;
-    gap: 50px;
+    gap: 60px;
+    /* Más aire entre items */
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 .service-item {
     display: flex;
     align-items: center;
-    gap: 0px;
+    gap: 40px;
+    padding: 40px;
+    border-radius: 20px;
+    background: #fff;
+    /* Estado por defecto: "Apagado/Inactivo" */
+    opacity: 0.3;
+    transform: scale(0.95);
+    transition: all 0.5s ease-out;
+    border: 1px solid transparent;
+}
+
+/* Cuando la clase .active es añadida por JS */
+.service-item.active {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+    /* Sombra suave */
+    border-color: rgba(192, 36, 182, 0.1);
+    /* Borde rosa muy sutil */
 }
 
 .service-item:nth-child(even) {
     flex-direction: row-reverse;
+    text-align: right;
 }
 
+/* Íconos */
 .service-item__icon {
     flex-shrink: 0;
-    font-size: 6rem;
-    width: 180px;
+    font-size: 4.5rem;
+    /* Un poco más chicos y elegantes */
+    width: 120px;
     text-align: center;
-    color: transparent;
-    -webkit-text-stroke: 2px #3423ae;
-    text-stroke: 2px var(--color-highlight);
+
+    /* Por defecto: Gris */
+    color: #e9ecef;
+    transition: all 0.5s ease;
+}
+
+/* Ícono Activo: Gradiente Corporativo */
+.service-item.active .service-item__icon {
+    /* El truco del gradiente en el ícono */
+    background: -webkit-linear-gradient(135deg, #c024b6 0%, #00b8ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    /* Sutil resplandor */
+    filter: drop-shadow(0 10px 10px rgba(192, 36, 182, 0.2));
+    transform: scale(1.1);
 }
 
 .service-item__text h3 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: var(--color-primary);
 }
 
 .service-item__text p {
-    font-size: 1rem;
-    line-height: 1.7;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #6c757d;
     margin-bottom: 0;
 }
 
-.service-separator {
-    border: 0;
-    height: 1px;
-    background-color: var(--color-border);
-    width: 80%;
-    margin: 0 auto;
+/* Ajuste Móvil */
+@media (max-width: 768px) {
+    .service-item {
+        flex-direction: column !important;
+        /* Siempre columna en móvil */
+        text-align: center !important;
+        padding: 30px 20px;
+        gap: 20px;
+        /* En móvil quitamos el efecto de opacidad fuerte para mejorar legibilidad */
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .service-item__icon {
+        font-size: 3.5rem;
+        /* En móvil dejamos el color activo siempre visible */
+        background: -webkit-linear-gradient(135deg, #c024b6 0%, #00b8ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
 }
 
 /* ===================================================================
@@ -1354,4 +1410,132 @@ section {
     }
 
 
+}
+
+/* --- 18. SECCIÓN MÉTRICAS (NIVEL DIOS) --- */
+.metrics-section {
+    position: relative;
+    padding: 100px 0;
+    background: #080613;
+    /* Fondo muy oscuro */
+    overflow: hidden;
+    z-index: 10;
+}
+
+.metrics-header {
+    text-align: center;
+    margin-bottom: 60px;
+    position: relative;
+    z-index: 2;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    position: relative;
+    z-index: 2;
+}
+
+/* --- EN TU STYLE.CSS --- */
+
+.metric-card {
+    background: rgba(255, 255, 255, 0.03);
+    /* Borde sutil con tu color corporativo */
+    border: 1px solid rgba(192, 36, 182, 0.3);
+    border-radius: 20px;
+    padding: 40px 30px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+
+    /* ACTIVADOR 3D REAL */
+    perspective: 1000px;
+    /* Esto crea la profundidad */
+    transform-style: preserve-3d;
+    /* Esto permite que los hijos roten */
+
+    /* Transición solo para bordes y sombras, NO para transform */
+    transition: border-color 0.3s, box-shadow 0.3s;
+    will-change: transform;
+}
+
+.metric-card:hover {
+    border-color: rgba(0, 184, 255, 0.5);
+    /* Azul brillante al hover */
+    box-shadow: 0 0 30px rgba(0, 184, 255, 0.15);
+    /* IMPORTANTE: Aquí NO ponemos transform: none ni nada parecido */
+}
+
+/* El brillo */
+.card-shine {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.15), transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: overlay;
+    /* Mejor fusión de luz */
+}
+
+.metric-card:hover .card-shine {
+    opacity: 1;
+}
+
+.metric-card:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 30px rgba(48, 35, 174, 0.2);
+}
+
+.metric-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    transform: translateZ(20px);
+    /* Efecto 3D: el texto flota sobre la tarjeta */
+}
+
+.metric-number {
+    font-family: var(--font-heading);
+    font-size: 4rem;
+    font-weight: 800;
+    color: transparent;
+    background: linear-gradient(135deg, #c024b6 0%, #00b8ff 100%);
+    /* Gradiente Cian/Verde Tech */
+    -webkit-background-clip: text;
+    background-clip: text;
+    margin-bottom: 15px;
+    line-height: 1;
+}
+
+.metric-title {
+    font-size: 1.3rem;
+    color: #fff;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.metric-desc {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .metric-card {
+        margin-bottom: 20px;
+    }
 }
