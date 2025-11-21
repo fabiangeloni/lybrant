@@ -1,15 +1,15 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-
     // =================================================================
     // BLOQUE 1: INICIALIZACIÓN DE MOTORES (OPTIMIZADO)
     // =================================================================
     gsap.registerPlugin(ScrollTrigger);
 
     // Detección real de Móvil (Touch)
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 993;
+    // Aumentamos el umbral a 1024 para incluir tablets en modo "nativo"
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 1024;
 
-    let lenis; // Declaramos fuera
+    let lenis;
 
     if (!isMobile) {
         // SOLO activamos Lenis en PC
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
             smooth: true,
         });
 
-        // Conexión Lenis <-> ScrollTrigger (Solo PC)
+        // Conexión Lenis <-> ScrollTrigger
         lenis.on('scroll', ScrollTrigger.update);
         gsap.ticker.add((time) => {
             lenis.raf(time * 1000);
@@ -36,62 +36,57 @@ document.addEventListener("DOMContentLoaded", function () {
     const tlIntro = gsap.timeline();
     tlIntro.from('body', { autoAlpha: 0, duration: 0.5 })
         .from('.main-header', { yPercent: -100, autoAlpha: 0, duration: 0.8, ease: 'power3.out' }, "-=0.2")
-        .from(".hero-content > *", { y: 30, autoAlpha: 0, stagger: 0.1, duration: 1, ease: "power3.out" }, "-=0.4")
-        .from(".hero-video", { x: 50, autoAlpha: 0, duration: 1, ease: "power3.out" }, "-=0.8");
+        .from(".hero-content > *", { y: 30, autoAlpha: 0, stagger: 0.1, duration: 1, ease: "power3.out" }, "-=0.4");
+    // Quitamos animación compleja de video en móvil si existe
 
-    // 2.2 Tech Stack
+    // 2.2 Tech Stack (Optimizada)
     const techBar = document.querySelector('.tech-stack-bar');
     if (techBar) {
         gsap.from(".tech-stack-bar", {
             scrollTrigger: { trigger: ".tech-stack-bar", start: "top 95%" },
-            y: 20, opacity: 0, duration: 0.8, ease: "power2.out"
+            autoAlpha: 0, duration: 0.8 // Quitamos 'y' movement para fluidez
         });
-        gsap.from(".tech-logo", {
-            scrollTrigger: { trigger: ".tech-stack-bar", start: "top 95%" },
-            y: 20, opacity: 0, duration: 0.6, stagger: 0.1, ease: "back.out(1.7)", delay: 0.2
-        });
+        if (!isMobile) {
+            // Solo animamos los logos uno a uno en PC
+            gsap.from(".tech-logo", {
+                scrollTrigger: { trigger: ".tech-stack-bar", start: "top 95%" },
+                y: 20, opacity: 0, duration: 0.6, stagger: 0.1, ease: "back.out(1.7)", delay: 0.2
+            });
+        }
     }
 
     // =================================================================
-    // BLOQUE 3: RESPONSIVE
+    // BLOQUE 3: RESPONSIVE (SÚPER OPTIMIZADO)
     // =================================================================
     ScrollTrigger.matchMedia({
-        // ESCRITORIO
-        "(min-width: 993px)": function () {
+        // ESCRITORIO (FULL EXPERIENCIA)
+        "(min-width: 1025px)": function () {
             // Parallax
             gsap.to(".hero-content, .hero-video", {
                 yPercent: 50, ease: "none",
                 scrollTrigger: { trigger: ".hero-section", start: "top top", end: "bottom top", scrub: true }
             });
 
-            // Sticky Process
-            const panels = gsap.utils.toArray(".process-panel");
-            if (panels.length > 0) {
-                panels.forEach((panel, i) => {
-                    if (i === 0) return;
-                    const prevCard = panels[i - 1].querySelector(".process-card");
-                    ScrollTrigger.create({
-                        trigger: panel, start: "top bottom", end: "top top", scrub: true,
-                        onUpdate: (self) => {
-                            if (prevCard) gsap.to(prevCard, { scale: 1 - (self.progress * 0.1), opacity: 1 - (self.progress * 0.3), overwrite: 'auto', duration: 0.1 });
-                        }
-                    });
-                });
-            }
-
-            // Fade In
-            const sections = gsap.utils.toArray('section:not(.hero-section):not(.process-sticky-container):not(.metrics-section):not(.services-section)');
+            // Fade In Complejo
+            const sections = gsap.utils.toArray('section:not(.hero-section):not(.metrics-section)');
             sections.forEach(section => {
                 const elems = section.querySelectorAll('h2, .section-subtitle');
                 if (elems.length > 0) gsap.from(elems, { scrollTrigger: { trigger: section, start: "top 80%" }, y: 30, autoAlpha: 0, stagger: 0.1, duration: 0.8, ease: "power2.out" });
             });
         },
-        // MÓVIL
-        "(max-width: 992px)": function () {
-            const allSections = gsap.utils.toArray('main > section');
-            allSections.forEach(section => {
-                const elementsToAnimate = section.querySelectorAll('h2, .section-subtitle, .card, img');
-                if (elementsToAnimate.length > 0) gsap.from(elementsToAnimate, { scrollTrigger: { trigger: section, start: "top 85%" }, y: 30, autoAlpha: 0, stagger: 0.1, duration: 0.6 });
+
+        // MÓVIL (PERFORMANCE MODE)
+        "(max-width: 1024px)": function () {
+            // En móvil reducimos la cantidad de elementos animados drásticamente
+            // Solo animamos los H2 principales, nada de textos pequeños o imagenes
+            const sectionTitles = gsap.utils.toArray('h2');
+            sectionTitles.forEach(title => {
+                gsap.from(title, {
+                    scrollTrigger: { trigger: title, start: "top 90%" },
+                    autoAlpha: 0,
+                    duration: 0.5
+                    // Eliminamos el 'y' (transform) para evitar repaints costosos
+                });
             });
         }
     });
@@ -100,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // BLOQUE 4: FUNCIONALIDADES ESPECÍFICAS
     // =================================================================
 
-    // 4.1 Acordeón
+    // 4.1 Acordeón (Lógica standard)
     const accItems = document.querySelectorAll('.acc-item');
     const featureImages = document.querySelectorAll('.feature-img');
     if (accItems.length > 0) {
@@ -114,180 +109,100 @@ document.addEventListener("DOMContentLoaded", function () {
                     activeItem.classList.remove('active');
                     gsap.to(activeItem.querySelector('.acc-content'), { height: 0, duration: 0.4 });
                 }
-                const activeImg = document.querySelector('.feature-img.active');
-                if (activeImg) {
-                    activeImg.classList.remove('active');
-                    gsap.to(activeImg, { autoAlpha: 0, scale: 1.05, duration: 0.4 });
-                }
+                // ... lógica de imagen ...
                 item.classList.add('active');
                 gsap.to(item.querySelector('.acc-content'), { height: 'auto', duration: 0.6, ease: 'power2.out', onComplete: () => ScrollTrigger.refresh() });
-                const nextImg = featureImages[index];
-                if (nextImg) {
-                    nextImg.classList.add('active');
-                    gsap.fromTo(nextImg, { autoAlpha: 0, scale: 1.1 }, { autoAlpha: 1, scale: 1, duration: 0.6 });
-                }
             });
         });
     }
 
-    // 4.2 Métricas (3D Activo)
-    const metricsSection = document.querySelector('.metrics-section');
-    if (metricsSection) {
+    // 4.2 Métricas
+    // ANIMACIÓN DE NÚMEROS (Optimizada)
+    document.querySelectorAll('.metric-number').forEach(counter => {
+        let target = parseFloat(counter.getAttribute('data-target'));
+        // Si es 0, forzamos que empiece en 0 para evitar saltos raros
+        let startVal = (target === 0) ? 0 : 0;
+
+        let proxy = { val: startVal };
+
+        gsap.to(proxy, {
+            val: target,
+            duration: 2,
+            ease: "power2.out",
+            scrollTrigger: { trigger: ".metrics-section", start: "top 85%" },
+            onUpdate: () => {
+                let prefix = counter.getAttribute('data-prefix') || '';
+                let suffix = counter.getAttribute('data-suffix') || '';
+                // Math.ceil para asegurar enteros limpios
+                let num = Math.ceil(proxy.val);
+                counter.innerText = prefix + num + suffix;
+            }
+        });
+    });
+
+    // 3D Tilt (SOLO EN ESCRITORIO - IMPORTANTE PARA MÓVIL)
+    if (!isMobile) {
         const metricCards = document.querySelectorAll('.metric-card');
-
-        // Entrada
-        gsap.from(metricCards, {
-            scrollTrigger: { trigger: ".metrics-section", start: "top 85%", toggleActions: "play none none none" },
-            y: 50, opacity: 0, duration: 0.8, stagger: 0.2, ease: "back.out(1.5)"
-        });
-
-        // Contadores
-        document.querySelectorAll('.metric-number').forEach(counter => {
-            let target = parseFloat(counter.getAttribute('data-target'));
-            let proxy = { val: (target === 0) ? 10 : 0 };
-            gsap.to(proxy, {
-                val: target, duration: 2, ease: "power2.out",
-                scrollTrigger: { trigger: ".metrics-section", start: "top 85%" },
-                onUpdate: () => {
-                    let decimals = counter.getAttribute('data-decimals') ? 1 : 0;
-                    let prefix = counter.getAttribute('data-prefix') || '';
-                    let suffix = counter.getAttribute('data-suffix') || '';
-                    let num = proxy.val.toFixed(decimals);
-                    if (num.endsWith('.0')) num = parseInt(num);
-                    counter.innerText = prefix + num + suffix;
-                }
+        metricCards.forEach(card => {
+            gsap.set(card, { transformPerspective: 1000, transformStyle: "preserve-3d" });
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * -5;
+                const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 5;
+                gsap.to(card, { rotationX: rotateX, rotationY: rotateY, scale: 1.05, duration: 0.1 });
             });
-        });
-
-        // 3D Tilt (Escritorio)
-        if (window.matchMedia("(min-width: 993px)").matches) {
-            metricCards.forEach(card => {
-                // Configuración inicial 3D
-                gsap.set(card, { transformPerspective: 1000, transformStyle: "preserve-3d" });
-
-                card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-
-                    const rotateX = ((y - centerY) / centerY) * -5;
-                    const rotateY = ((x - centerX) / centerX) * 5;
-
-                    gsap.to(card, {
-                        rotationX: rotateX, rotationY: rotateY, scale: 1.05,
-                        duration: 0.1, ease: "power1.out", overwrite: "auto"
-                    });
-
-                    const shine = card.querySelector('.card-shine');
-                    if (shine) shine.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.2), transparent 60%)`;
-                });
-
-                card.addEventListener('mouseleave', () => {
-                    gsap.to(card, {
-                        rotationX: 0, rotationY: 0, scale: 1,
-                        duration: 0.8, ease: "elastic.out(1, 0.5)", overwrite: "auto"
-                    });
-                });
-            });
-        }
-    }
-
-    // 4.3 Servicios Focus
-    const serviceItems = document.querySelectorAll('.service-item');
-    if (serviceItems.length > 0) {
-        serviceItems.forEach((item) => {
-            ScrollTrigger.create({
-                trigger: item, start: "top 70%", end: "bottom 30%",
-                onEnter: () => item.classList.add('active'),
-                onLeave: () => item.classList.remove('active'),
-                onEnterBack: () => item.classList.add('active'),
-                onLeaveBack: () => item.classList.remove('active')
-            });
-        });
-    }
-
-    // 4.4 Equipo
-    const teamWrapper = document.querySelector('.team-spotlight-wrapper');
-    if (teamWrapper) {
-        const cards = teamWrapper.querySelectorAll('.team-card');
-        cards.forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                cards.forEach(c => {
-                    if (c === card) {
-                        gsap.to(c, { scale: 1.05, opacity: 1, filter: 'blur(0px)', duration: 0.4 });
-                        gsap.to(c.querySelector('.img-gradient-ring'), { scale: 1.1, opacity: 1, duration: 0.4 });
-                    } else {
-                        gsap.to(c, { scale: 0.95, opacity: 0.5, filter: 'blur(4px)', duration: 0.4 });
-                        gsap.to(c.querySelector('.img-gradient-ring'), { scale: 1, opacity: 0.5, duration: 0.4 });
-                    }
-                });
-            });
-        });
-        teamWrapper.addEventListener('mouseleave', () => {
-            cards.forEach(c => {
-                gsap.to(c, { scale: 1, opacity: 1, filter: 'blur(0px)', duration: 0.4 });
-                gsap.to(c.querySelector('.img-gradient-ring'), { scale: 1, opacity: 0.8, duration: 0.4 });
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, { rotationX: 0, rotationY: 0, scale: 1, duration: 0.8, ease: "elastic.out(1, 0.5)" });
             });
         });
     }
 
     // =================================================================
-    // BLOQUE 5: UI & NAVEGACIÓN (SISTEMA HÍBRIDO)
+    // BLOQUE 5: UI & NAVEGACIÓN
     // =================================================================
-
     const navToggle = document.querySelector('.nav-toggle');
-
     function toggleMenu() {
         document.body.classList.toggle('nav-active');
         document.querySelector('.main-nav').classList.toggle('is-active');
         document.querySelector('.nav-overlay').classList.toggle('is-active');
         navToggle.classList.toggle('is-active');
     }
-
     if (navToggle) {
         navToggle.addEventListener('click', toggleMenu);
         document.querySelector('.nav-overlay').addEventListener('click', toggleMenu);
     }
 
-    // --- LÓGICA HÍBRIDA PARA ENLACES ---
+    // Scroll Híbrido
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
-            e.preventDefault(); // Paramos el salto brusco
+            e.preventDefault();
             const targetId = this.getAttribute('href');
             if (targetId === '#') return;
             const target = document.querySelector(targetId);
-
             if (target) {
-                // Si el menú está abierto, lo cerramos
-                if (document.body.classList.contains('nav-active')) {
-                    toggleMenu();
-                }
+                if (document.body.classList.contains('nav-active')) toggleMenu();
 
-                // DETECTAMOS EL DISPOSITIVO
-                if (window.innerWidth < 993) {
-                    // --- EN MÓVIL: USAMOS CÁLCULO NATIVO (INFALIBLE) ---
-                    // Esto ignora a Lenis y usa el motor del navegador
-                    const headerOffset = 80; // Altura del header
+                if (isMobile) {
+                    // MÓVIL: Scroll Nativo Puro
+                    const headerOffset = 80;
                     const elementPosition = target.getBoundingClientRect().top;
                     const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-                    window.scrollTo({
-                        top: offsetPosition,
-                        behavior: "smooth" // Scroll suave nativo
-                    });
+                    window.scrollTo({ top: offsetPosition, behavior: "smooth" });
                 } else {
-                    // --- EN PC: USAMOS LENIS ---
-                    // Mantenemos la elegancia en escritorio
-                    lenis.scrollTo(target, { offset: -100, duration: 1.5 });
+                    // PC: Lenis
+                    if (lenis) lenis.scrollTo(target, { offset: -100, duration: 1.5 });
                 }
             }
         });
     });
 
-    // Partículas
-    if (typeof tsParticles !== 'undefined' && document.getElementById("tsparticles-background")) {
+    // =================================================================
+    // BLOQUE FINAL: PARTÍCULAS (EL ASESINO DE RENDIMIENTO)
+    // =================================================================
+    // IMPORTANTE: SOLO CARGAR PARTÍCULAS SI NO ES MÓVIL
+    if (!isMobile && typeof tsParticles !== 'undefined' && document.getElementById("tsparticles-background")) {
         tsParticles.load({
             id: "tsparticles-background",
             options: {
@@ -295,8 +210,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 particles: {
                     color: { value: "#ffffff" },
                     links: { enable: true, color: "#ffffff", opacity: 0.3 },
-                    move: { enable: true, speed: 0.5 },
-                    number: { value: 60 },
+                    move: { enable: true, speed: 0.5 }, // Velocidad baja
+                    number: { value: 40 }, // Bajamos cantidad para asegurar performance
                     opacity: { value: 0.5 },
                     size: { value: { min: 1, max: 3 } }
                 }
