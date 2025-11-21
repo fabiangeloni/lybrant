@@ -1539,3 +1539,19 @@ section {
         margin-bottom: 20px;
     }
 }
+
+/* La "Ceja" SEO: Texto pequeño para Google, encima del H1 */
+.hero-eyebrow {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 800;
+    /* Bien grueso */
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    /* Espaciado elegante */
+    color: #6C63FF;
+    /* Usa tu color primario aquí (el violeta/azul de tu marca) */
+    margin-bottom: 1rem;
+    font-family: 'Roboto', sans-serif;
+    /* O la fuente que uses */
+}

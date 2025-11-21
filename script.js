@@ -1,14 +1,18 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     // =================================================================
-    // BLOQUE 1: INICIALIZACIÓN
+    // BLOQUE 1: INICIALIZACIÓN DE MOTORES
     // =================================================================
     gsap.registerPlugin(ScrollTrigger);
 
+    // Configuración Lenis (Híbrida)
     const lenis = new Lenis({
         duration: 1.2,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smooth: true
+        direction: 'vertical',
+        smooth: true,        // PC: Suave
+        smoothTouch: false,  // MÓVIL: Nativo (Vital para que se sienta bien el dedo)
+        touchMultiplier: 2,
     });
 
     lenis.on('scroll', ScrollTrigger.update);
@@ -45,6 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // BLOQUE 3: RESPONSIVE
     // =================================================================
     ScrollTrigger.matchMedia({
+        // ESCRITORIO
         "(min-width: 993px)": function () {
             // Parallax
             gsap.to(".hero-content, .hero-video", {
@@ -67,13 +72,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             }
 
-            // Fade In General
+            // Fade In
             const sections = gsap.utils.toArray('section:not(.hero-section):not(.process-sticky-container):not(.metrics-section):not(.services-section)');
             sections.forEach(section => {
                 const elems = section.querySelectorAll('h2, .section-subtitle');
                 if (elems.length > 0) gsap.from(elems, { scrollTrigger: { trigger: section, start: "top 80%" }, y: 30, autoAlpha: 0, stagger: 0.1, duration: 0.8, ease: "power2.out" });
             });
         },
+        // MÓVIL
         "(max-width: 992px)": function () {
             const allSections = gsap.utils.toArray('main > section');
             allSections.forEach(section => {
@@ -117,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // 4.2 MÉTRICAS NIVEL DIOS (3D REAL HABILITADO)
+    // 4.2 Métricas (3D Activo)
     const metricsSection = document.querySelector('.metrics-section');
     if (metricsSection) {
         const metricCards = document.querySelectorAll('.metric-card');
@@ -146,49 +152,35 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
 
-        // --- LÓGICA 3D TILT ---
+        // 3D Tilt (Escritorio)
         if (window.matchMedia("(min-width: 993px)").matches) {
             metricCards.forEach(card => {
-
-                // 1. CONFIGURACIÓN INICIAL 3D (Vital)
-                // Esto le dice a GSAP: "Prepara este elemento para moverse en 3D con profundidad 1000"
+                // Configuración inicial 3D
                 gsap.set(card, { transformPerspective: 1000, transformStyle: "preserve-3d" });
 
                 card.addEventListener('mousemove', (e) => {
                     const rect = card.getBoundingClientRect();
                     const x = e.clientX - rect.left;
                     const y = e.clientY - rect.top;
-
                     const centerX = rect.width / 2;
                     const centerY = rect.height / 2;
 
-                    // Ángulos aumentados para visibilidad (20 grados)
-                    const rotateX = ((y - centerY) / centerY) * -3;
-                    const rotateY = ((x - centerX) / centerX) * 3;
+                    const rotateX = ((y - centerY) / centerY) * -5;
+                    const rotateY = ((x - centerX) / centerX) * 5;
 
-                    // Animación rápida y directa
                     gsap.to(card, {
-                        rotationX: rotateX, // GSAP usa rotationX, no rotateX
-                        rotationY: rotateY,
-                        scale: 1.02, // Zoom visible
-                        duration: 0.1, // Respuesta casi instantánea
-                        ease: "power1.out",
-                        overwrite: "auto"
+                        rotationX: rotateX, rotationY: rotateY, scale: 1.05,
+                        duration: 0.1, ease: "power1.out", overwrite: "auto"
                     });
 
                     const shine = card.querySelector('.card-shine');
-                    if (shine) shine.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.25), transparent 60%)`;
+                    if (shine) shine.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.2), transparent 60%)`;
                 });
 
                 card.addEventListener('mouseleave', () => {
-                    // Retorno suave al centro
                     gsap.to(card, {
-                        rotationX: 0,
-                        rotationY: 0,
-                        scale: 1,
-                        duration: 0.8,
-                        ease: "elastic.out(1, 0.5)",
-                        overwrite: "auto"
+                        rotationX: 0, rotationY: 0, scale: 1,
+                        duration: 0.8, ease: "elastic.out(1, 0.5)", overwrite: "auto"
                     });
                 });
             });
@@ -235,29 +227,54 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =================================================================
-    // BLOQUE 5: UI
+    // BLOQUE 5: UI & NAVEGACIÓN (SISTEMA HÍBRIDO)
     // =================================================================
 
-    // Menú
     const navToggle = document.querySelector('.nav-toggle');
-    if (navToggle) {
-        navToggle.addEventListener('click', () => {
-            document.body.classList.toggle('nav-active');
-            document.querySelector('.main-nav').classList.toggle('is-active');
-            document.querySelector('.nav-overlay').classList.toggle('is-active');
-            navToggle.classList.toggle('is-active');
-        });
-        document.querySelector('.nav-overlay').addEventListener('click', () => navToggle.click());
+
+    function toggleMenu() {
+        document.body.classList.toggle('nav-active');
+        document.querySelector('.main-nav').classList.toggle('is-active');
+        document.querySelector('.nav-overlay').classList.toggle('is-active');
+        navToggle.classList.toggle('is-active');
     }
 
-    // Links
+    if (navToggle) {
+        navToggle.addEventListener('click', toggleMenu);
+        document.querySelector('.nav-overlay').addEventListener('click', toggleMenu);
+    }
+
+    // --- LÓGICA HÍBRIDA PARA ENLACES ---
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
+            e.preventDefault(); // Paramos el salto brusco
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            const target = document.querySelector(targetId);
+
             if (target) {
-                if (document.body.classList.contains('nav-active')) navToggle.click();
-                lenis.scrollTo(target, { offset: -100, duration: 1.5 });
+                // Si el menú está abierto, lo cerramos
+                if (document.body.classList.contains('nav-active')) {
+                    toggleMenu();
+                }
+
+                // DETECTAMOS EL DISPOSITIVO
+                if (window.innerWidth < 993) {
+                    // --- EN MÓVIL: USAMOS CÁLCULO NATIVO (INFALIBLE) ---
+                    // Esto ignora a Lenis y usa el motor del navegador
+                    const headerOffset = 80; // Altura del header
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: "smooth" // Scroll suave nativo
+                    });
+                } else {
+                    // --- EN PC: USAMOS LENIS ---
+                    // Mantenemos la elegancia en escritorio
+                    lenis.scrollTo(target, { offset: -100, duration: 1.5 });
+                }
             }
         });
     });
@@ -281,5 +298,4 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     setTimeout(() => { ScrollTrigger.refresh(); }, 500);
-
 });
