@@ -1,27 +1,28 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     // =================================================================
-    // BLOQUE 0: CONFIGURACIÓN CRÍTICA (PERFORMANCE MÓVIL)
+    // BLOQUE 0: CONFIGURACIÓN CRÍTICA
     // =================================================================
     gsap.registerPlugin(ScrollTrigger);
 
-    // 1. ESTO ARREGLA EL SCROLL "RARO" EN MÓVIL
-    // Evita que GSAP recalcule todo cuando la barra de dirección del navegador se mueve.
-    ScrollTrigger.config({
-        ignoreMobileResize: true
-    });
+    ScrollTrigger.config({ ignoreMobileResize: true });
 
-    // 2. Detección robusta de móvil
+    // Detección Móvil
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 993;
 
+    // OPTIMIZACIÓN CSS FORZADA VÍA JS PARA MÓVIL
+    if (isMobile) {
+        document.documentElement.style.scrollBehavior = 'auto';
+        document.body.style.scrollBehavior = 'auto';
+    }
+
     // =================================================================
-    // BLOQUE 1: INICIALIZACIÓN DE MOTORES
+    // BLOQUE 1: LENIS (SOLO PC)
     // =================================================================
 
-    let lenis; // Declaramos fuera para usarla luego
+    let lenis;
 
     if (!isMobile) {
-        // SOLO activamos Lenis en PC (Scroll Cinematográfico)
         lenis = new Lenis({
             duration: 1.2,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -29,11 +30,13 @@ document.addEventListener("DOMContentLoaded", function () {
             smooth: true,
         });
 
-        // Conexión Lenis <-> ScrollTrigger
         lenis.on('scroll', ScrollTrigger.update);
         gsap.ticker.add((time) => {
             lenis.raf(time * 1000);
         });
+
+        // ESTA LÍNEA CAUSABA EL SCROLL ROBÓTICO EN MÓVIL
+        // Ahora está encerrada solo para PC
         gsap.ticker.lagSmoothing(0);
     }
 
@@ -41,21 +44,18 @@ document.addEventListener("DOMContentLoaded", function () {
     // BLOQUE 2: ANIMACIONES GLOBALES
     // =================================================================
 
-    // 2.1 Intro
     const tlIntro = gsap.timeline();
     tlIntro.from('body', { autoAlpha: 0, duration: 0.5 })
         .from('.main-header', { yPercent: -100, autoAlpha: 0, duration: 0.8, ease: 'power3.out' }, "-=0.2")
         .from(".hero-content > *", { y: 30, autoAlpha: 0, stagger: 0.1, duration: 1, ease: "power3.out" }, "-=0.4")
         .from(".hero-video", { x: 50, autoAlpha: 0, duration: 1, ease: "power3.out" }, "-=0.8");
 
-    // 2.2 Tech Stack
     const techBar = document.querySelector('.tech-stack-bar');
     if (techBar) {
         gsap.from(".tech-stack-bar", {
             scrollTrigger: { trigger: ".tech-stack-bar", start: "top 95%" },
             y: 20, opacity: 0, duration: 0.8, ease: "power2.out"
         });
-        // En móvil animamos el bloque entero, en PC logo por logo
         if (!isMobile) {
             gsap.from(".tech-logo", {
                 scrollTrigger: { trigger: ".tech-stack-bar", start: "top 95%" },
@@ -70,13 +70,11 @@ document.addEventListener("DOMContentLoaded", function () {
     ScrollTrigger.matchMedia({
         // ESCRITORIO
         "(min-width: 993px)": function () {
-            // Parallax
             gsap.to(".hero-content, .hero-video", {
                 yPercent: 50, ease: "none",
                 scrollTrigger: { trigger: ".hero-section", start: "top top", end: "bottom top", scrub: true }
             });
 
-            // Sticky Process
             const panels = gsap.utils.toArray(".process-panel");
             if (panels.length > 0) {
                 panels.forEach((panel, i) => {
@@ -91,7 +89,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             }
 
-            // Fade In General
             const sections = gsap.utils.toArray('section:not(.hero-section):not(.process-sticky-container):not(.metrics-section):not(.services-section)');
             sections.forEach(section => {
                 const elems = section.querySelectorAll('h2, .section-subtitle');
@@ -112,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // BLOQUE 4: FUNCIONALIDADES ESPECÍFICAS
     // =================================================================
 
-    // 4.1 Acordeón
+    // Acordeón
     const accItems = document.querySelectorAll('.acc-item');
     const featureImages = document.querySelectorAll('.feature-img');
     if (accItems.length > 0) {
@@ -142,18 +139,16 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // 4.2 Métricas
+    // Métricas
     const metricsSection = document.querySelector('.metrics-section');
     if (metricsSection) {
         const metricCards = document.querySelectorAll('.metric-card');
 
-        // Entrada
         gsap.from(metricCards, {
             scrollTrigger: { trigger: ".metrics-section", start: "top 85%", toggleActions: "play none none none" },
             y: 50, opacity: 0, duration: 0.8, stagger: 0.2, ease: "back.out(1.5)"
         });
 
-        // Contadores
         document.querySelectorAll('.metric-number').forEach(counter => {
             let target = parseFloat(counter.getAttribute('data-target'));
             let proxy = { val: (target === 0) ? 10 : 0 };
@@ -171,7 +166,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
 
-        // 3D Tilt (SOLO ESCRITORIO - CRÍTICO PARA PERFORMANCE MÓVIL)
         if (!isMobile) {
             metricCards.forEach(card => {
                 gsap.set(card, { transformPerspective: 1000, transformStyle: "preserve-3d" });
@@ -192,7 +186,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // 4.3 Servicios Focus Reveal (ESTO FALTABA ANTES)
+    // Servicios Focus
     const serviceItems = document.querySelectorAll('.service-item');
     if (serviceItems.length > 0) {
         serviceItems.forEach((item) => {
@@ -206,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // 4.4 Equipo
+    // Equipo
     const teamWrapper = document.querySelector('.team-spotlight-wrapper');
     if (teamWrapper) {
         const cards = teamWrapper.querySelectorAll('.team-card');
@@ -232,50 +226,41 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =================================================================
-    // BLOQUE 5: UI & NAVEGACIÓN (SISTEMA HÍBRIDO)
+    // BLOQUE 5: UI & NAVEGACIÓN
     // =================================================================
 
     const navToggle = document.querySelector('.nav-toggle');
-
     function toggleMenu() {
         document.body.classList.toggle('nav-active');
         document.querySelector('.main-nav').classList.toggle('is-active');
         document.querySelector('.nav-overlay').classList.toggle('is-active');
         navToggle.classList.toggle('is-active');
     }
-
     if (navToggle) {
         navToggle.addEventListener('click', toggleMenu);
         document.querySelector('.nav-overlay').addEventListener('click', toggleMenu);
     }
 
-    // Scroll Híbrido Links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
             if (targetId === '#') return;
             const target = document.querySelector(targetId);
-
             if (target) {
                 if (document.body.classList.contains('nav-active')) toggleMenu();
-
-                // Si es móvil, usamos scroll nativo para máxima fluidez
                 if (isMobile) {
                     const headerOffset = 80;
                     const elementPosition = target.getBoundingClientRect().top;
                     const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
                     window.scrollTo({ top: offsetPosition, behavior: "smooth" });
                 } else {
-                    // Si es PC, usamos Lenis
                     if (lenis) lenis.scrollTo(target, { offset: -100, duration: 1.5 });
                 }
             }
         });
     });
 
-    // Partículas (SOLO PC)
-    // Desactivamos en móvil para ganar FPS en el scroll
     if (!isMobile && typeof tsParticles !== 'undefined' && document.getElementById("tsparticles-background")) {
         tsParticles.load({
             id: "tsparticles-background",
