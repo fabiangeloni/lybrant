@@ -518,7 +518,7 @@ section {
 /* --- 9. PROCESO STICKY (STACKING CARDS) --- */
 .process-sticky-container {
     padding-top: 80px;
-    padding-bottom: 80px;
+    padding-bottom: 0px;
     background-color: #fff;
     position: relative;
     z-index: 5;
