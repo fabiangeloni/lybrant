@@ -41,28 +41,31 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =================================================================
-    // BLOQUE 2: ANIMACIONES GLOBALES
+    // BLOQUE 2: ANIMACIONES GLOBALES (INTRO + TECH STACK UNIFICADOS)
     // =================================================================
 
     const tlIntro = gsap.timeline();
+
+    // 1. Aparece el Body y Header
     tlIntro.from('body', { autoAlpha: 0, duration: 0.5 })
         .from('.main-header', { yPercent: -100, autoAlpha: 0, duration: 0.8, ease: 'power3.out' }, "-=0.2")
-        .from(".hero-content > *", { y: 30, autoAlpha: 0, stagger: 0.1, duration: 1, ease: "power3.out" }, "-=0.4")
-        .from(".hero-video", { x: 50, autoAlpha: 0, duration: 1, ease: "power3.out" }, "-=0.8");
 
-    const techBar = document.querySelector('.tech-stack-bar');
-    if (techBar) {
-        gsap.from(".tech-stack-bar", {
-            scrollTrigger: { trigger: ".tech-stack-bar", start: "top 95%" },
-            y: 20, opacity: 0, duration: 0.8, ease: "power2.out"
-        });
-        if (!isMobile) {
-            gsap.from(".tech-logo", {
-                scrollTrigger: { trigger: ".tech-stack-bar", start: "top 95%" },
-                y: 20, opacity: 0, duration: 0.6, stagger: 0.1, ease: "back.out(1.7)", delay: 0.2
-            });
-        }
-    }
+        // 2. Aparece el contenido del Hero
+        .from(".hero-content > *", { y: 30, autoAlpha: 0, stagger: 0.1, duration: 1, ease: "power3.out" }, "-=0.4")
+        .from(".hero-video", { x: 50, autoAlpha: 0, duration: 1, ease: "power3.out" }, "-=0.8")
+
+        // 3. Aparece la Barra de Logos (GARANTIZADO)
+        // Usamos .fromTo para forzar la visibilidad pase lo que pase
+        .fromTo(".tech-stack-bar",
+            { y: 20, autoAlpha: 0 },
+            { y: 0, autoAlpha: 1, duration: 0.8, ease: "power2.out" },
+            "-=0.5" // Aparece un poco antes de que termine la intro del hero
+        );
+
+    // 4. Animación cascada de logos individuales (Solo PC)
+    // Esto es decorativo, si falla no importa porque la barra ya es visible
+
+
 
     // =================================================================
     // BLOQUE 3: RESPONSIVE

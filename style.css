@@ -1597,4 +1597,22 @@ section {
     }
 }
 
+.logo-grid img {
+    opacity: 1
+}
+
+.tech-stack-bar {
+    /* ... tus otros estilos ... */
+
+    /* FUERZA VISIBILIDAD INICIAL */
+    opacity: 1;
+    visibility: visible;
+
+    /* ELEVAR CAPA (Para que no la tapen el Hero o Metrics) */
+    position: relative;
+    z-index: 15;
+    background-color: #fff;
+    /* Fondo sólido para tapar lo de atrás */
+}
+
 /* Si tu Hero tiene fondo oscuro, cambia el color a: color: #ccc; */
