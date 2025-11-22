@@ -138,6 +138,7 @@ a {
     left: 0;
     width: 100%;
     height: 2px;
+    background: linear-gradient(90deg, #c024b6, #00b8ff);
     background-color: var(--color-highlight);
     /* Usamos amarillo para resaltar */
     transform: scaleX(0);
@@ -518,7 +519,7 @@ section {
 .process-sticky-container {
     padding-top: 80px;
     padding-bottom: 80px;
-    background-color: #f8f9fa;
+    background-color: #fff;
     position: relative;
     z-index: 5;
 }
@@ -578,8 +579,7 @@ section {
 /* --- 10. SERVICIOS --- */
 /* --- 10. SERVICIOS (FOCUS REVEAL) --- */
 .services-section {
-    background-color: #ffffff;
-    /* O un gris muy muy suave #fcfcfc */
+    background-color: #f8f9fa;
     position: relative;
     z-index: 5;
     padding: 120px 0;
@@ -1561,7 +1561,7 @@ section {
 /* Micro-copy debajo del botón: Reduce ansiedad */
 .hero-microcopy {
     margin-top: 0.7rem;
-    font-size: 0.8rem;
+    font-size: 0.67rem;
     color: #666;
     font-weight: 300;
     display: flex;
@@ -1611,7 +1611,7 @@ section {
     /* ELEVAR CAPA (Para que no la tapen el Hero o Metrics) */
     position: relative;
     z-index: 15;
-    background-color: #fff;
+    background-color: #f5f5f5;
     /* Fondo sólido para tapar lo de atrás */
 }
 
