@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lybrant-web
+    ports:
+      - "${PORT:-8080}:80"  # Puerto configurable vía variable de entorno, default 8080
+    restart: unless-stopped
+    volumes:
+      # Montar la carpeta raíz del proyecto para desarrollo (hot reload)
+      - .:/usr/share/nginx/html:ro
+    networks:
+      - lybrant-network
+
+networks:
+  lybrant-network:
+    driver: bridge
+

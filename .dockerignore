@@ -1,0 +1,14 @@
+# Archivos y directorios a ignorar en el build de Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+.git
+.gitignore
+README.md
+*.md
+.env
+.env.local
+node_modules
+.DS_Store
+Thumbs.db
+

@@ -1,8 +1,20 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     // =================================================================
-    // BLOQUE 0: CONFIGURACIÓN CRÍTICA
+    // BLOQUE 0: CONFIGURACIÓN CRÍTICA Y ERROR HANDLING
     // =================================================================
+    
+    // Verificar que GSAP esté cargado
+    if (typeof gsap === 'undefined') {
+        console.error('GSAP no se cargó correctamente. Algunas animaciones pueden no funcionar.');
+        return;
+    }
+
+    if (typeof ScrollTrigger === 'undefined') {
+        console.error('ScrollTrigger no se cargó correctamente. Algunas animaciones pueden no funcionar.');
+        return;
+    }
+
     gsap.registerPlugin(ScrollTrigger);
 
     ScrollTrigger.config({ ignoreMobileResize: true });
@@ -23,21 +35,30 @@ document.addEventListener("DOMContentLoaded", function () {
     let lenis;
 
     if (!isMobile) {
-        lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            direction: 'vertical',
-            smooth: true,
-        });
+        // Verificar que Lenis esté disponible
+        if (typeof Lenis !== 'undefined') {
+            try {
+                lenis = new Lenis({
+                    duration: 1.2,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                    direction: 'vertical',
+                    smooth: true,
+                });
 
-        lenis.on('scroll', ScrollTrigger.update);
-        gsap.ticker.add((time) => {
-            lenis.raf(time * 1000);
-        });
+                lenis.on('scroll', ScrollTrigger.update);
+                gsap.ticker.add((time) => {
+                    lenis.raf(time * 1000);
+                });
 
-        // ESTA LÍNEA CAUSABA EL SCROLL ROBÓTICO EN MÓVIL
-        // Ahora está encerrada solo para PC
-        gsap.ticker.lagSmoothing(0);
+                // ESTA LÍNEA CAUSABA EL SCROLL ROBÓTICO EN MÓVIL
+                // Ahora está encerrada solo para PC
+                gsap.ticker.lagSmoothing(0);
+            } catch (error) {
+                console.warn('Error al inicializar Lenis:', error);
+            }
+        } else {
+            console.warn('Lenis no está disponible. El smooth scroll no funcionará.');
+        }
     }
 
     // =================================================================
@@ -264,20 +285,104 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    // =================================================================
+    // BLOQUE 6: PARTICLES BACKGROUND
+    // =================================================================
     if (!isMobile && typeof tsParticles !== 'undefined' && document.getElementById("tsparticles-background")) {
-        tsParticles.load({
-            id: "tsparticles-background",
-            options: {
-                background: { color: "transparent" },
-                particles: {
-                    color: { value: "#ffffff" },
-                    links: { enable: true, color: "#ffffff", opacity: 0.3 },
-                    move: { enable: true, speed: 0.5 },
-                    number: { value: 60 },
-                    opacity: { value: 0.5 },
-                    size: { value: { min: 1, max: 3 } }
+        try {
+            tsParticles.load({
+                id: "tsparticles-background",
+                options: {
+                    background: { color: "transparent" },
+                    particles: {
+                        color: { value: "#ffffff" },
+                        links: { enable: true, color: "#ffffff", opacity: 0.3 },
+                        move: { enable: true, speed: 0.5 },
+                        number: { value: 60 },
+                        opacity: { value: 0.5 },
+                        size: { value: { min: 1, max: 3 } }
+                    }
                 }
+            });
+        } catch (error) {
+            console.warn('Error al cargar tsParticles:', error);
+        }
+    }
+
+    // =================================================================
+    // BLOQUE 7: VALIDACIÓN Y MANEJO DE FORMULARIO
+    // =================================================================
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Obtener valores del formulario
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const message = document.getElementById('message').value.trim();
+            
+            // Validación básica mejorada
+            let errors = [];
+            
+            if (name.length < 2) {
+                errors.push('El nombre debe tener al menos 2 caracteres');
             }
+            
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                errors.push('Por favor ingresa un email válido');
+            }
+            
+            // Validar email corporativo (opcional, puede ser muy restrictivo)
+            // if (!email.includes('@') || email.endsWith('@gmail.com') || email.endsWith('@yahoo.com')) {
+            //     errors.push('Por favor usa tu email corporativo');
+            // }
+            
+            if (message.length < 10) {
+                errors.push('El mensaje debe tener al menos 10 caracteres');
+            }
+            
+            if (errors.length > 0) {
+                alert('Por favor corrige los siguientes errores:\n\n' + errors.join('\n'));
+                return;
+            }
+            
+            // Aquí se podría enviar a un backend o servicio de formularios
+            // Por ahora solo mostramos un mensaje de éxito
+            const submitButton = contactForm.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            
+            submitButton.textContent = 'Enviando...';
+            submitButton.disabled = true;
+            
+            // Simular envío (reemplazar con llamada real a API)
+            setTimeout(() => {
+                alert('¡Gracias por tu consulta! Nos pondremos en contacto contigo pronto.');
+                contactForm.reset();
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+                
+                // TODO: Integrar con servicio de formularios (Formspree, Netlify Forms, etc.)
+                // Ejemplo con Formspree:
+                // fetch('https://formspree.io/f/YOUR_FORM_ID', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify({ name, email, message })
+                // })
+                // .then(response => response.json())
+                // .then(data => {
+                //     alert('¡Mensaje enviado con éxito!');
+                //     contactForm.reset();
+                // })
+                // .catch(error => {
+                //     alert('Error al enviar el mensaje. Por favor intenta nuevamente.');
+                //     console.error('Error:', error);
+                // })
+                // .finally(() => {
+                //     submitButton.textContent = originalText;
+                //     submitButton.disabled = false;
+                // });
+            }, 1000);
         });
     }
 
