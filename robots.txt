@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Ubicación del sitemap
+Sitemap: https://lybran.com/sitemap.xml
